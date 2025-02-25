@@ -22,6 +22,8 @@ public class User {
         return schedules;
     }
 
+    public Schedule getSchedule(int scheduleID) { return null; }
+
     public String getName() {
         return name;
     }
