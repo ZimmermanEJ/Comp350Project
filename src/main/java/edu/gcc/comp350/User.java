@@ -1,4 +1,10 @@
 package edu.gcc.comp350;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
 
 public class User {
@@ -8,10 +14,12 @@ public class User {
     private int year;
     private String email;
     private int userID;
-    private String passwordHash;
+    private byte[] passwordHash;
 
     public User(String name, String email, String password) {
-
+        this.name = name;
+        this.email = email;
+        setPasswordHash(password);
     }
 
     public void addSchedule(Schedule schedule) { }
@@ -56,11 +64,22 @@ public class User {
         this.userID = userID;
     }
 
-    public String getPasswordHash() {
+    public byte[] getPasswordHash() {
         return passwordHash;
     }
 
-    public void setPasswordHash(String password) {
 
+    public void setPasswordHash(String password) {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            this.passwordHash = factory.generateSecret(spec).getEncoded();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
