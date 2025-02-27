@@ -20,6 +20,7 @@ public class User {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
+        this.schedules = new ArrayList<Schedule>();
     }
 
     public void addSchedule(Schedule schedule) {
