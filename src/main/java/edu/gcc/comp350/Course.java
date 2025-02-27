@@ -1,6 +1,5 @@
 package edu.gcc.comp350;
 public class Course {
-
     private String department; // COMP
     private int courseNumber; // 350
     private char sectionCode; // A
