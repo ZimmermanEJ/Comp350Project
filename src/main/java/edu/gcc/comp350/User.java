@@ -22,15 +22,31 @@ public class User {
         setPasswordHash(password);
     }
 
-    public void addSchedule(Schedule schedule) { }
+    public void addSchedule(Schedule schedule) {
+        schedules.add(schedule);
+    }
 
-    public void deleteSchedule(Schedule schedule) { }
+    public void deleteSchedule(Schedule schedule) {
+        for (Schedule s : schedules) {
+            if (schedule.getScheduleID() == s.getScheduleID()) {
+                schedules.remove(s);
+                break;
+            }
+        }
+    }
 
     public ArrayList<Schedule> getSchedules() {
         return schedules;
     }
 
-    public Schedule getSchedule(int scheduleID) { return null; }
+    public Schedule getSchedule(int scheduleID) {
+        for (Schedule s : schedules) {
+            if (scheduleID == s.getScheduleID()) {
+                return s;
+            }
+        }
+        return null;
+    }
 
     public String getName() {
         return name;
