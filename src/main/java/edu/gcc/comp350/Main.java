@@ -11,7 +11,7 @@ public class Main {
         double[][] time = {{}, {2, 2.5}, {}, {2, 2.5}, {}, {2, 2.5}, {}};
         Course softwareEngineeringA = new Course("COMP", 350,
                 'A', "Software Engineering", 3, "description",
-                "Dr. Hutchins", 123456, 2.0, 2.5,
+                "Dr. Hutchins", 123456, Course.Days.MWF, 2.0, 2.5,
                 time);
 
         Scanner scanner = new Scanner(System.in);
@@ -27,11 +27,14 @@ public class Main {
             System.out.println("\nWelcome " + currentUser.getName() + "!");
 
             // show schedules
-            if (currentUser.getSchedules() == null) {
+            if (currentUser.getSchedules().isEmpty()) {
                 System.out.println("You don't have any schedules.");
             } else {
                 System.out.println("Here are your schedules:");
-                System.out.println(currentUser.getSchedules());
+                for (Schedule schedule : currentUser.getSchedules()){
+                    System.out.println(schedule.listView());
+                }
+
             }
 
             // user opens a schedule
@@ -45,13 +48,16 @@ public class Main {
                 String scheduleName = scanner.nextLine();
                 Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName);
                 currentUser.addSchedule(mySchedule);
+
+                mySchedule.addCourse(softwareEngineeringA);
+
                 currentSchedule = mySchedule;
             } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
                 break;
-            } else if (currentUser.getSchedules() == null) { // user doesn't have any schedule to open
+            } else if (currentUser.getSchedules().isEmpty()) { // user doesn't have any schedule to open
                 System.out.println("You don't have any existing schedules, try creating one.");
                 continue;
-            } else if (currentUser.getSchedules() != null) { // user does have schedules
+            } else { // user does have schedules
                 try { //
                     int scheduleID = Integer.parseInt(scheduleInput);
 
@@ -65,16 +71,13 @@ public class Main {
                         }
                     }
                     if (!assigned) { // schedule does not exist
-                        System.out.println("No schedule " + scheduleInput + ". Try again\n");
+                        System.out.println("No schedule " + scheduleInput + ". Try again");
                         continue;
                     }
                 } catch (NumberFormatException e) { // didn't input a number
                     System.out.println("Input not valid, try again");
                     continue;
                 }
-            } else { // user input other text
-                System.out.println("Input not valid, try again\n");
-                continue;
             }
 
             // do whatever user wants to do with schedule
@@ -87,7 +90,7 @@ public class Main {
                 if (nextAction.equalsIgnoreCase("quit")){
                     break;
                 } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
-                    System.out.println("Schedule view to be implemented");
+                    System.out.println(currentSchedule.scheduleView());
                 } else if (nextAction.equalsIgnoreCase("search")) { // search
                     System.out.println("Search to be implemented");
                 } else { // invalid input

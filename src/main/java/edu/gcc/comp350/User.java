@@ -11,10 +11,15 @@ public class User {
     private String passwordHash;
 
     public User(String name, String email, String password) {
-
+        this.name = name;
+        this.email = email;
+        this.passwordHash = password;
+        this.schedules = new ArrayList<Schedule>();
     }
 
-    public void addSchedule(Schedule schedule) { }
+    public void addSchedule(Schedule schedule) {
+        schedules.add(schedule);
+    }
 
     public void deleteSchedule(Schedule schedule) { }
 
