@@ -15,6 +15,7 @@ public class User {
     private String email;
     private int userID;
     private byte[] passwordHash;
+    private byte[] salt;
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -88,13 +89,17 @@ public class User {
 
     public void setPasswordHash(String password) {
         SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
+        this.salt = new byte[16];
         random.nextBytes(salt);
 
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+        this.passwordHash = hash(password);
+    }
+
+    public byte[] hash(String password) {
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), this.salt, 65536, 128);
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            this.passwordHash = factory.generateSecret(spec).getEncoded();
+            return factory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
