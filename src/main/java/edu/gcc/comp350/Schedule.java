@@ -11,9 +11,9 @@ public class Schedule {
     private Map<Course, String> courses; // course to color
     private Map<Event, String> events; // event to color
 
-    public Schedule(int userID, String name) {
+    public Schedule(int userID, String name, int scheduleID) {
         this.userID = userID;
-        this.scheduleID = 1;
+        this.scheduleID = scheduleID;
         this.name = name;
         this.courses = new HashMap<Course, String>();
         this.events = new HashMap<Event, String>();

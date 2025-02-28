@@ -76,7 +76,7 @@ public class Main {
                 if (scheduleInput.equalsIgnoreCase("new")) { // create schedule
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
-                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName);
+                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, currentUser.getNumSchedulesCreated());
                     currentUser.addSchedule(mySchedule);
 
                     mySchedule.addCourse(softwareEngineeringA);
