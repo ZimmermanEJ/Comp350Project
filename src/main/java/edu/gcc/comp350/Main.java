@@ -68,7 +68,7 @@ public class Main {
                 }
 
                 // user opens a schedule
-                System.out.print("Enter the schedule id you would like to open, or 'new' for new schedule ('quit' to quit): ");
+                System.out.print("Enter the schedule id you would like to open, or 'new', or 'delete' (or 'quit'): ");
                 scheduleInput = scanner.nextLine();
                 Schedule currentSchedule = null; // schedule to open
 
@@ -87,6 +87,33 @@ public class Main {
                 } else if (currentUser.getSchedules().isEmpty()) { // user doesn't have any schedule to open
                     System.out.println("You don't have any existing schedules, try creating one.");
                     continue;
+                } else if (scheduleInput.equalsIgnoreCase("delete")){
+                    System.out.print("Enter the ID of the schedule to delete (or 'quit'): ");
+                    scheduleInput = scanner.nextLine();
+                    if (scheduleInput.equalsIgnoreCase("quit")) {
+                        continue;
+                    }
+                    try { //
+                        int scheduleID = Integer.parseInt(scheduleInput);
+
+                        ArrayList<Schedule> schedules = currentUser.getSchedules();
+                        boolean deleted = false;
+                        for (Schedule schedule : schedules) {
+                            if (schedule.getScheduleID() == scheduleID) { // schedule exists
+                                currentUser.deleteSchedule(schedule);
+                                deleted = true;
+                                System.out.println("Schedule " + schedule.getScheduleID() + " successfully deleted");
+                                break;
+                            }
+                        }
+                        if (!deleted) { // schedule does not exist
+                            System.out.println("No schedule " + scheduleInput);
+                        }
+                        continue;
+                    } catch (NumberFormatException e) { // didn't input a number
+                        System.out.println("Input not valid");
+                        continue;
+                    }
                 } else { // user does have schedules
                     try { //
                         int scheduleID = Integer.parseInt(scheduleInput);
