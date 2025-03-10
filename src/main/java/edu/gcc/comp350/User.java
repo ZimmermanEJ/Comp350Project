@@ -15,15 +15,20 @@ public class User {
     private String email;
     private int userID;
     private byte[] passwordHash;
+    private byte[] salt;
+    private int numSchedulesCreated;
 
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
+        this.schedules = new ArrayList<Schedule>();
+        numSchedulesCreated = 0;
     }
 
     public void addSchedule(Schedule schedule) {
         schedules.add(schedule);
+        numSchedulesCreated++;
     }
 
     public void deleteSchedule(Schedule schedule) {
@@ -33,6 +38,10 @@ public class User {
                 break;
             }
         }
+    }
+
+    public int getNumSchedulesCreated() {
+        return numSchedulesCreated;
     }
 
     public ArrayList<Schedule> getSchedules() {
@@ -87,13 +96,17 @@ public class User {
 
     public void setPasswordHash(String password) {
         SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
+        this.salt = new byte[16];
         random.nextBytes(salt);
 
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+        this.passwordHash = hash(password);
+    }
+
+    public byte[] hash(String password) {
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), this.salt, 65536, 128);
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            this.passwordHash = factory.generateSecret(spec).getEncoded();
+            return factory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
