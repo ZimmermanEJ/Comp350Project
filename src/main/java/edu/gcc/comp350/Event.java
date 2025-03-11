@@ -1,13 +1,17 @@
 package edu.gcc.comp350;
 
+import java.util.ArrayList;
+
 public class Event {
 
     private String name;
-    private int[][] timeSlots; // always 7 x 2
+    private boolean[] days;
+    private double startTime;
+    private double endTime;
     private String description;
     private int eventID;
 
-    public Event(String name, int[][] timeSlots, String description){
+    public Event(String name, boolean[] days, double startTime, double endTime, String description){
 
     }
 
@@ -19,13 +23,21 @@ public class Event {
         this.name = name;
     }
 
-    public int[][] getTimeSlots() {
-        return timeSlots;
+    public boolean[] getDays() { return days; }
+
+    public void setDays(boolean[] days) { this.days = days; }
+
+    public double getStartTime() {
+        return startTime;
     }
 
-    public void setTimeSlots(int[][] timeSlots) {
-        this.timeSlots = timeSlots;
+    public void setStartTime(double startTime) { this.startTime = startTime; }
+
+    public double getEndTime() {
+        return endTime;
     }
+
+    public void setEndTime(double endTime) { this.endTime = endTime; }
 
     public String getDescription() {
         return description;

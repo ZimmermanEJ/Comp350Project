@@ -9,6 +9,17 @@ public class Main {
         run();
     }
     public static void run() {
+
+        // structure of I/O
+
+        // login
+            // open schedule
+                // view
+                // search
+            // create schedule
+            // delete schedule
+        // signup
+
         // fake user for testing
         User currentUser = new User("Temp", "a@a.com", "pw");
         // Course used for testing
@@ -148,8 +159,121 @@ public class Main {
                         break;
                     } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
                         System.out.println(currentSchedule.scheduleView());
+                        while (true) {
+                            System.out.print("Enter 'e' to add event, 'rc' to remove a course, 're' to remove an event, or 'quit': ");
+                            String next = scanner.nextLine();
+
+                            if (next.equalsIgnoreCase("quit")) {
+                                break;
+                            } else if (next.equalsIgnoreCase("e")){
+                                // Add event
+                                System.out.print("Event name: ");
+                                String name = scanner.nextLine();
+                                boolean[] days = new boolean[7];
+                                String[] week = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+                                for (int i = 0; i < 7; i++) {
+                                    String day = week[i];
+                                    while (true) {
+                                        System.out.print("Is the event on " + day + "? ('y' or 'n'): ");
+                                        String response = scanner.nextLine();
+                                        if (response.equalsIgnoreCase("y")) {
+                                            days[i]= true;
+                                            break;
+                                        } else if (response.equalsIgnoreCase("n")) {
+                                            break;
+                                        } else {
+                                            System.out.println("Invalid input, try again");
+                                        }
+                                    }
+                                }
+                                double startT;
+                                while (true) {
+                                    System.out.print("Event start time (from 0.00 to 24.00): ");
+                                    String startTime = scanner.nextLine();
+                                    try {
+                                        startT = Double.parseDouble(startTime);
+                                        if (startT < 0 || startT > 24) {
+                                            throw new Exception();
+                                        }
+                                        break;
+                                    } catch (Exception e) {
+                                        System.out.println("Invalid time, try again");
+                                    }
+                                }
+                                double endT;
+                                while (true) {
+                                    System.out.print("Event end time (from 0.00 to 24.00): ");
+                                    String endTime = scanner.nextLine();
+                                    try {
+                                        endT = Double.parseDouble(endTime);
+                                        if (endT < 0 || endT > 24) {
+                                            throw new Exception();
+                                        }
+                                        break;
+                                    } catch (Exception e) {
+                                        System.out.println("Invalid time, try again");
+                                    }
+                                }
+                                System.out.print("Event description: ");
+                                String description = scanner.nextLine();
+                                Event e = new Event(name, days, startT, endT, description);
+                                currentSchedule.addEvent(e);
+                                System.out.println("Successfully added " + e.getName());
+                            } else if (next.equalsIgnoreCase("rc")){
+                                // TODO: remove course
+                            } else if (next.equalsIgnoreCase("re")){
+                                // TODO: remove event
+                            } else {
+                                System.out.println("Input not recognized, try again");
+                            }
+                        }
                     } else if (nextAction.equalsIgnoreCase("search")) { // search
-                        System.out.println("Search to be implemented");
+                        System.out.print("Enter your search, or 'quit': ");
+                        String search = scanner.nextLine();
+
+                        if (search.equalsIgnoreCase("quit")) {
+                            continue;
+                        }
+
+                        System.out.println("Searched for " + search);
+                        // TODO: Make search object
+                        Search s;
+                        // TODO: Make a filter object
+                        Filter f;
+                        while (true) {
+                            // TODO: Print search results
+                            System.out.println("Search results will appear here");
+
+                            System.out.print("Filters: Enter 'c' for credits, 'dep' for department, 'd' for days, 's' for start time, 'e' for end time, or 'quit': ");
+                            String filter = scanner.nextLine();
+
+                            if (filter.equalsIgnoreCase("quit")) {
+                                break;
+                            } else if (filter.equalsIgnoreCase("c")) {
+                                System.out.print("Enter credit filter: ");
+                                String credits = scanner.nextLine();
+                                // TODO: Make a copy of 'f' and update credits
+                            } else if (filter.equalsIgnoreCase("dep")) {
+                                System.out.print("Enter department filter: ");
+                                String department = scanner.nextLine();
+                                // TODO: Make a copy of 'f' and update department
+                            } else if (filter.equalsIgnoreCase("d")) {
+                                System.out.print("Enter days filter ('MWF' or 'TR'): ");
+                                String days = scanner.nextLine();
+                                // TODO: Make a copy of 'f' and update days
+                            } else if (filter.equalsIgnoreCase("s")) {
+                                System.out.print("Enter start time filter: ");
+                                String startTime = scanner.nextLine();
+                                // TODO: Make a copy of 'f' and update startTime
+                            } else if (filter.equalsIgnoreCase("e")) {
+                                System.out.print("Enter end time filter: ");
+                                String endTime = scanner.nextLine();
+                                // TODO: Make a copy of 'f' and update endTime
+                            } else {
+                                System.out.print("Invalid input, try again");
+                            }
+                        }
+
                     } else { // invalid input
                         System.out.println("Input not valid, try again\n");
                     }

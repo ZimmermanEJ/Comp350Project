@@ -20,13 +20,16 @@ public class Schedule {
     }
 
     public boolean addCourse(Course course) {
+        // TODO: check for conflicts
         courses.put(course, "Red");
         return true;
     }
 
     public void removeCourse(Course course) { }
 
-    public void addEvent(Event event) { }
+    public void addEvent(Event event) {
+        events.put(event, "Blue");
+    }
 
     public void removeEvent(Event event) { }
 
@@ -70,6 +73,7 @@ public class Schedule {
         StringBuilder toReturn = new StringBuilder(this.getName() + " - " + this.getTotalCredits() + " credits\n");
 
         for (Course course : this.getCourses().keySet()) {
+            toReturn.append("ID: ").append(course.getCourseID()).append("\t");
             toReturn.append(course.getTitle()).append("\t");
             toReturn.append(course.getDays()).append("\t");
             toReturn.append(String.format("%.2f", course.getStartTime())).append(" - ").append(String.format("%.2f", course.getEndTime()));
