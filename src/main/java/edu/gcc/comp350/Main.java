@@ -15,7 +15,10 @@ public class Main {
         // login
             // open schedule
                 // view
+                    // event
+                    // remove course
                 // search
+                    // filters
             // create schedule
             // delete schedule
         // signup
