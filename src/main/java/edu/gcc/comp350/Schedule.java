@@ -13,13 +13,22 @@ public class Schedule {
 
     public Schedule(int userID, String name) {
 
+
     }
 
     public boolean addCourse(Course course) {
+        if(hasConflict(course)){
+            return false;
+        }
+        else{
+            courses.put(course.getCourseID(), "none");
+        }
         return true;
     }
 
-    public void removeCourse(Course course) { }
+    public void removeCourse(Course course) {
+        courses.remove(course.getCourseID());
+    }
 
     public void addEvent(Event event) { }
 
