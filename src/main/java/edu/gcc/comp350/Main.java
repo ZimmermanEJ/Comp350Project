@@ -13,7 +13,7 @@ public class Main {
 
         // structure of I/O
 
-        // login
+        // login or signup
             // open schedule
                 // view
                     // event
@@ -22,7 +22,7 @@ public class Main {
                     // filters
             // create schedule
             // delete schedule
-        // signup
+
 
         // arraylist used for storing users with fake user added for testing
         ArrayList<User> users = new ArrayList<>();
