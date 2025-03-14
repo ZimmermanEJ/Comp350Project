@@ -1,5 +1,6 @@
 package edu.gcc.comp350;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -23,8 +24,10 @@ public class Main {
             // delete schedule
         // signup
 
-        // fake user for testing
-        User currentUser = new User("Temp", "a@a.com", "pw");
+        // arraylist used for storing users with fake user added for testing
+        ArrayList<User> users = new ArrayList<>();
+        User tempUser = new User("Temp", "a@a.com", "pw");
+        users.add(tempUser);
         // Course used for testing
         double[][] time = {{}, {14, 14.5}, {}, {14, 14.5}, {}, {14, 14.5}, {}};
         Course softwareEngineeringA = new Course("COMP", 350,
@@ -44,6 +47,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
+        User currentUser = null;
         while (true) {
             System.out.print("Enter 'login', 'signup', or 'quit': ");
             String nextInput = scanner.nextLine();
@@ -55,26 +59,36 @@ public class Main {
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
-                    if (currentUser.getEmail().equalsIgnoreCase(email)) {
-                        if (Arrays.equals(currentUser.getPasswordHash(), currentUser.hash(password))) {
-                            break;
-                        } else {
-                            System.out.println("Invalid password");
+                    for (User s : users) {
+                        if (s.getEmail().equalsIgnoreCase(email)) {
+                            if (Arrays.equals(s.getPasswordHash(), s.hash(password))) {
+                                currentUser = s;
+                                break;
+                            }
                         }
+                    }
+                    if (currentUser == null) {
+                        System.out.println("Invalid credentials");
                     } else {
-                        System.out.println("Invalid email address");
+                        break;
                     }
                 }
             } else if (nextInput.equalsIgnoreCase("signup")) {
-                System.out.println();
-
+                System.out.print("Enter name: ");
+                String name = scanner.nextLine();
+                System.out.print("Enter email: ");
+                String email = scanner.nextLine();
+                System.out.print("Enter password: ");
+                String password = scanner.nextLine();
+                User newUser = new User(name, email, password);
+                users.add(newUser);
+                currentUser = newUser;
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
             } else {
                 System.out.println("Invalid input, try again");
                 continue;
             }
-
 
             String scheduleInput = "";
             while (true) { // loop until user quits
