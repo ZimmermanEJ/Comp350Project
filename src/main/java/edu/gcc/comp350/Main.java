@@ -13,24 +13,37 @@ public class Main {
 
         // structure of I/O
 
-        // login
+        // login or signup
             // open schedule
                 // view
+                    // event
+                    // remove course
                 // search
+                    // filters
             // create schedule
             // delete schedule
-        // signup
+
 
         // arraylist used for storing users with fake user added for testing
         ArrayList<User> users = new ArrayList<>();
         User tempUser = new User("Temp", "a@a.com", "pw");
         users.add(tempUser);
         // Course used for testing
-        double[][] time = {{}, {2, 2.5}, {}, {2, 2.5}, {}, {2, 2.5}, {}};
+        double[][] time = {{}, {14, 14.5}, {}, {14, 14.5}, {}, {14, 14.5}, {}};
         Course softwareEngineeringA = new Course("COMP", 350,
                 'A', "Software Engineering", 3, "description",
-                "Dr. Hutchins", 123456, Course.Days.MWF, 2.0, 2.5,
+                "Dr. Hutchins", 123456, Course.Days.MWF, 14.0, 14.5,
                 time);
+        double[][] time1 = {{}, {12, 12.5}, {}, {12, 12.5}, {11, 11.5}, {12, 12.5}, {}};
+        Course discrete = new Course("MATH", 214,
+                'A', "Discrete Math", 3, "description",
+                "Dr. Bancroft", 123456, Course.Days.MWF, 12.0, 12.5,
+                time1);
+        double[][] time2 = {{}, {}, {9.3, 10.45}, {}, {9.3, 10.45}, {}, {}};
+        Course OS = new Course("COMP", 340,
+                'B', "Operating Systems", 3, "description",
+                "Dr. Zhang", 123456, Course.Days.TR, 9.3, 10.45,
+                time2);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -105,6 +118,8 @@ public class Main {
                     currentUser.addSchedule(mySchedule);
 
                     mySchedule.addCourse(softwareEngineeringA);
+                    mySchedule.addCourse(OS);
+                    mySchedule.addCourse(discrete);
 
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out

@@ -8,20 +8,28 @@ public class Schedule {
     private int userID;
     private int scheduleID;
     private String name;
-    private Map<Integer, String> courses; // courseID to color
-    private Map<Integer, String> events; // eventID to color
+    private Map<Course, String> courses; // course to color
+    private Map<Event, String> events; // event to color
 
-    public Schedule(int userID, String name) {
-
+    public Schedule(int userID, String name, int scheduleID) {
+        this.userID = userID;
+        this.scheduleID = scheduleID;
+        this.name = name;
+        this.courses = new HashMap<Course, String>();
+        this.events = new HashMap<Event, String>();
     }
 
     public boolean addCourse(Course course) {
+        // TODO: check for conflicts
+        courses.put(course, "Red");
         return true;
     }
 
     public void removeCourse(Course course) { }
 
-    public void addEvent(Event event) { }
+    public void addEvent(Event event) {
+        events.put(event, "Blue");
+    }
 
     public void removeEvent(Event event) { }
 
@@ -30,7 +38,11 @@ public class Schedule {
     }
 
     public int getTotalCredits() {
-        return 0;
+        int total = 0;
+        for (Course course : this.getCourses().keySet()){
+            total += course.getCredits();
+        }
+        return total;
     }
 
     public int getUserID() {
@@ -49,11 +61,52 @@ public class Schedule {
         this.name = name;
     }
 
-    public Map<Integer, String> getCourses() {
+    public Map<Course, String> getCourses() {
         return courses;
     }
 
-    public Map<Integer, String> getEvents() {
+    public Map<Event, String> getEvents() {
         return events;
+    }
+
+    public String scheduleView() {
+        StringBuilder toReturn = new StringBuilder(this.getName() + " - " + this.getTotalCredits() + " credits\n");
+        String[] dayList = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+        for (int i = 0; i < 7; i++) {
+            toReturn.append(dayList[i]).append(":\n");
+            for (int hour = 8; hour <= 21; hour++) {
+                toReturn.append(((hour-1) % 12) + 1).append(hour <= 11 ? "AM" :"PM").append(":\t");
+                for (Course course : this.getCourses().keySet()) {
+                    double[][] timeslot = course.getTimeSlot();
+                    double[] day = timeslot[i];
+                    if (day.length == 2 && hour >= day[0] && hour < day[1]) {
+                        if (i == 1 || i == 3 || i == 5) {
+                            toReturn.append(course.getTitle()).append("\t");
+                            toReturn.append("ID: ").append(course.getCourseID()).append("\t");
+                            toReturn.append(String.format("%.2f", ((day[0]-1) % 12) + 1)).append(" - ").append(String.format("%.2f", ((day[1]-1) % 12) + 1));
+                        } else if (i == 2 || i == 4) {
+                            toReturn.append(course.getTitle()).append("\t");
+                            toReturn.append("ID: ").append(course.getCourseID()).append("\t");
+                            toReturn.append(String.format("%.2f", ((day[0]-1) % 12) + 1)).append(" - ").append(String.format("%.2f", ((day[1]-1) % 12) + 1));
+                        }
+                    }
+                }
+                toReturn.append("\n");
+            }
+            toReturn.append("\n");
+        }
+
+        return toReturn.toString();
+    }
+
+    public String listView() {
+        StringBuilder toReturn = new StringBuilder("ID: ");
+
+        toReturn.append(this.getScheduleID()).append("\t");
+        toReturn.append("Name: ").append(this.getName());
+        toReturn.append(" - ").append(this.getTotalCredits()).append(" credits");
+
+        return toReturn.toString();
     }
 }
