@@ -43,6 +43,12 @@ public class Schedule {
         events.remove(event);
     }
 
+   /**
+     * Checks if the given course has a time conflict with any existing courses in the schedule.
+     *
+     * @param course the course to check for conflicts
+     * @return true if there is a conflict, false otherwise
+     */
     public boolean hasConflict(Course course) {
 
         for (Course key : courses.keySet()) {
