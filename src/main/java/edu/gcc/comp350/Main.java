@@ -149,6 +149,7 @@ public class Main {
                     mySchedule.addCourse(softwareEngineeringA);
                     mySchedule.addCourse(OS);
                     mySchedule.addCourse(discrete);
+                    //mySchedule.addCourse(discrete);
 
 
                     currentSchedule = mySchedule;

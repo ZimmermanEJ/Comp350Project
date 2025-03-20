@@ -40,6 +40,22 @@ public class Course {
         this.courseID = 1;
     }
 
+    public boolean hasConflict(Course course) {
+        for (int i = 0; i < 7; i++) {
+            if(this.timeSlot[i].length > 1 && course.timeSlot[i].length > 1) {
+                if (this.timeSlot[i][0] == course.timeSlot[i][0] && this.timeSlot[i][1] == course.timeSlot[i][1]) {
+                    return true;
+                }
+                if (this.timeSlot[i][0] < course.timeSlot[i][0] && this.timeSlot[i][1] > course.timeSlot[i][0]) {
+                    return true;
+                }
+                if (this.timeSlot[i][0] > course.timeSlot[i][0] && this.timeSlot[i][0] < course.timeSlot[i][1]) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public String getDepartment() {
         return department;
