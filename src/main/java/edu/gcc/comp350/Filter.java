@@ -14,6 +14,18 @@ public class Filter {
     private double startTime;
     private double endTime;
 
+    /**
+     * Constructs a Filter object with the specified criteria and filters the search results.
+     *
+     * @param credits      the number of credits for the course
+     * @param department   the department offering the course (e.g., COMP)
+     * @param courseNumber the course number (e.g., 350)
+     * @param sectionCode  the section code (e.g., A)
+     * @param classdays    the days the class is held (e.g., MWF or TR)
+     * @param startTime    the start time of the course
+     * @param endTime      the end time of the course
+     * @param search       the search object containing the list of courses to filter
+     */
     public Filter(int credits, String department, int courseNumber,
                   char sectionCode, String classdays, double startTime, double endTime,
                   Search search) {

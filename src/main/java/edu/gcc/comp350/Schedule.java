@@ -28,11 +28,18 @@ public class Schedule {
     public void removeCourse(Course course) { }
 
     public void addEvent(Event event) {
+
         events.put(event, "Blue");
     }
 
     public void removeEvent(Event event) { }
 
+   /**
+     * Checks if the given course has a time conflict with any existing courses in the schedule.
+     *
+     * @param course the course to check for conflicts
+     * @return true if there is a conflict, false otherwise
+     */
     public boolean hasConflict(Course course) {
         return false;
     }

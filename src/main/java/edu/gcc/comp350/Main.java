@@ -48,11 +48,17 @@ public class Main {
 
         User currentUser = null;
         while (true) {
+
             System.out.print("Enter 'login', 'signup', or 'quit': ");
             String nextInput = scanner.nextLine();
 
             if (nextInput.equalsIgnoreCase("login")) {
+                int failedAttempts = 0;
                 while (true) {
+                    if(failedAttempts >= 5){
+                        System.out.println("Too many failed attempts, exiting");
+                        break;
+                    }
                     System.out.print("Enter email: ");
                     String email = scanner.nextLine();
                     System.out.print("Enter password: ");
@@ -66,6 +72,7 @@ public class Main {
                     }
                     if (currentUser == null) {
                         System.out.println("Invalid credentials");
+                        failedAttempts++;
                     } else {
                         break;
                     }
@@ -142,6 +149,7 @@ public class Main {
                     mySchedule.addCourse(softwareEngineeringA);
                     mySchedule.addCourse(OS);
                     mySchedule.addCourse(discrete);
+
 
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
