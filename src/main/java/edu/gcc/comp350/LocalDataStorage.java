@@ -67,14 +67,14 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
-    public Search GetCoursesSearch(Search search){
+    public ArrayList<Course> GetCoursesSearch(Search search){
         ArrayList<Course> retCourses = new ArrayList<>();
         for(Course course : courses){
             if (CourseContainsKeywords(course, search.getKeywords())){
                 retCourses.add(course);
             }
         }
-        return new Search(search.getKeywords(),retCourses);
+        return retCourses;
     }
 
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
@@ -123,6 +123,7 @@ public class LocalDataStorage implements IDataConnection {
     public User CreateNewUser(User user){
         if (GetUserByEmail(user.getEmail())==null){
             users.add(user);
+            user.setUserID(users.size());
             return user;
         }
         return null;

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface IDataConnection {
 
-    public Search GetCoursesSearch(Search search);
+    public ArrayList<Course> GetCoursesSearch(Search search);
 
     public Schedule SaveSchedule(Schedule schedule);
 
