@@ -74,7 +74,8 @@ public class LocalDataStorage implements IDataConnection {
                 retCourses.add(course);
             }
         }
-        return new Search(search.getKeywords(),retCourses);
+        search.SetResults(retCourses);
+        return search;
     }
 
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
@@ -123,6 +124,7 @@ public class LocalDataStorage implements IDataConnection {
     public User CreateNewUser(User user){
         if (GetUserByEmail(user.getEmail())==null){
             users.add(user);
+            user.setUserID(users.size());
             return user;
         }
         return null;

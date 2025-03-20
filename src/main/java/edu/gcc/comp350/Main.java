@@ -54,7 +54,7 @@ public class Main {
 
             System.out.print("Enter 'login', 'signup', or 'quit': ");
             String nextInput = scanner.nextLine();
-            ArrayList<Schedule> schedules;
+            ArrayList<Schedule> schedules = new ArrayList<>();
             if (nextInput.equalsIgnoreCase("login")) {
                 int failedAttempts = 0;
                 while (true) {
@@ -144,7 +144,7 @@ public class Main {
                 if (scheduleInput.equalsIgnoreCase("new")) { // create schedule
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
-                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, currentUser.getNumSchedulesCreated());
+                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, schedules.size());
                     schedules.add(mySchedule);
 
                     mySchedule.addCourse(softwareEngineeringA);

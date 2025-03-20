@@ -16,17 +16,11 @@ public class User {
     private byte[] passwordHash;
     private byte[] salt;
 
-    public User(String name, String email, String password, int userID) {
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
-        numSchedulesCreated = 0;
     }
-
-    public int getNumSchedulesCreated() {
-        return schedules.size();
-    }
-
 
     public String getName() {
         return name;
