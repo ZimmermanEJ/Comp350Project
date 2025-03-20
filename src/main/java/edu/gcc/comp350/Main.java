@@ -39,12 +39,12 @@ public class Main {
         double[][] time1 = {{}, {12, 12.5}, {}, {12, 12.5}, {11, 11.5}, {12, 12.5}, {}};
         Course discrete = new Course("MATH", 214,
                 'A', "Discrete Math", 3, "description",
-                "Dr. Bancroft", 123456, Course.Days.MWF, 12.0, 12.5,
+                "Dr. Bancroft", 111111, Course.Days.MWF, 12.0, 12.5,
                 time1);
         double[][] time2 = {{}, {}, {9.3, 10.45}, {}, {9.3, 10.45}, {}, {}};
         Course OS = new Course("COMP", 340,
                 'B', "Operating Systems", 3, "description",
-                "Dr. Zhang", 123456, Course.Days.TR, 9.3, 10.45,
+                "Dr. Zhang", 222222, Course.Days.TR, 9.3, 10.45,
                 time2);
 
         Scanner scanner = new Scanner(System.in);
@@ -144,6 +144,8 @@ public class Main {
                     schedules.add(mySchedule);
 
                     mySchedule.addCourse(softwareEngineeringA);
+                    mySchedule.addCourse(discrete);
+                    mySchedule.addCourse(OS);
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
                     break;
@@ -222,8 +224,8 @@ public class Main {
                         data.SaveSchedule(currentSchedule);
                         break;
                     } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
-                        System.out.println(currentSchedule.scheduleView());
                         while (true) {
+                            System.out.println(currentSchedule.scheduleView());
                             System.out.print("Enter 'e' to add event, 'rc' to remove a course, 're' to remove an event, or 'quit': ");
                             String next = scanner.nextLine();
 
@@ -284,9 +286,32 @@ public class Main {
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
                             } else if (next.equalsIgnoreCase("rc")){
-                                // TODO: remove course
+                                System.out.println(currentSchedule.getCourses());
+                                System.out.print("Enter the reference # of course to be removed: ");
+                                String course = scanner.nextLine();
+                                try {
+                                    int refNum = Integer.parseInt(course);
+                                    if (currentSchedule.removeCourse(refNum)) {
+                                        System.out.println("Course removed");
+                                    } else {
+                                        System.out.println("Course not found");
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Not a reference #");
+                                }
                             } else if (next.equalsIgnoreCase("re")){
-                                // TODO: remove event
+                                System.out.print("Enter the ID of event to be removed: ");
+                                String event = scanner.nextLine();
+                                try {
+                                    int eID = Integer.parseInt(event);
+                                    if (currentSchedule.removeEvent(eID)) {
+                                        System.out.println("Event removed");
+                                    } else {
+                                        System.out.println("Event not found");
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Not a valid ID");
+                                }
                             } else {
                                 System.out.println("Input not recognized, try again");
                             }
