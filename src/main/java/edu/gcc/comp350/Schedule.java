@@ -36,6 +36,7 @@ public class Schedule {
     }
 
     public void addEvent(Event event) {
+
         events.put(event, "Blue");
     }
 

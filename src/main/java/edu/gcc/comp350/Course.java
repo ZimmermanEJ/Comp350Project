@@ -14,6 +14,7 @@ public class Course {
     private String professor;
     private int referenceNumber;
     private Days days;
+    private boolean[] daysArray;
     private double startTime;
     private double endTime;
     private double[][] timeSlot;
@@ -32,13 +33,13 @@ public class Course {
         this.professor = professor;
         this.referenceNumber = referenceNumber;
         this.days = days;
+        this.daysArray = new boolean[5];
         this.startTime = startTime;
         this.endTime = endTime;
         this.timeSlot = timeSlot;
         this.courseID = 1;
     }
 
-    public boolean hasConflict(Course course) { return false; }
 
     public String getDepartment() {
         return department;
