@@ -10,8 +10,8 @@ public class Search {
     public Search(ArrayList<String> keywords) {
 
     }
-    public Search(ArrayList<String> keywords, ArrayList<Course> searchResults){
-
+    public void SetResults(ArrayList<Course> courses) {
+        searchResults = courses;
     }
 
     public ArrayList<String> getKeywords() {
