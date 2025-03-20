@@ -21,13 +21,20 @@ public class Schedule {
 
     public boolean addCourse(Course course) {
         // TODO: check for conflicts
-        courses.put(course, "Red");
-        return true;
+        if(hasConflict(course)) {
+            return false;
+        }else {
+            courses.put(course, "Red");
+            return true;
+        }
     }
 
-    public void removeCourse(Course course) { }
+    public void removeCourse(Course course) {
+        courses.remove(course);
+    }
 
     public void addEvent(Event event) {
+
         events.put(event, "Blue");
     }
 
@@ -35,7 +42,19 @@ public class Schedule {
         events.remove(event);
     }
 
+   /**
+     * Checks if the given course has a time conflict with any existing courses in the schedule.
+     *
+     * @param course the course to check for conflicts
+     * @return true if there is a conflict, false otherwise
+     */
     public boolean hasConflict(Course course) {
+        for (Course c : this.getCourses().keySet()) {
+            if (c.hasConflict(course)) {
+                System.out.println("Course " + course.getTitle() + " has a time conflict with course " + c.getTitle());
+                return true;
+            }
+        }
         return false;
     }
 
