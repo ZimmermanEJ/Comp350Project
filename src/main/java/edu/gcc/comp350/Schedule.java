@@ -21,19 +21,52 @@ public class Schedule {
 
     public boolean addCourse(Course course) {
         // TODO: check for conflicts
-        courses.put(course, "Red");
-        return true;
+        if(hasConflict(course)){
+            System.out.println("Course has a time conflict");
+            return false;
+        }
+        else {
+            courses.put(course, "Red");
+            return true;
+        }
     }
 
-    public void removeCourse(Course course) { }
+    public void removeCourse(Course course) {
+        courses.remove(course);
+    }
 
     public void addEvent(Event event) {
         events.put(event, "Blue");
     }
 
-    public void removeEvent(Event event) { }
+    public void removeEvent(Event event) {
+        events.remove(event);
+    }
 
+   /**
+     * Checks if the given course has a time conflict with any existing courses in the schedule.
+     *
+     * @param course the course to check for conflicts
+     * @return true if there is a conflict, false otherwise
+     */
     public boolean hasConflict(Course course) {
+
+        for (Course key : courses.keySet()) {
+            if(course.getDays() == key.getDays()){
+                if(course.getStartTime() == key.getStartTime()){
+                    return true;
+                }
+                else if(course.getStartTime() > key.getStartTime() && course.getStartTime() < key.getEndTime()){
+                    return true;
+                }
+                else if(course.getEndTime() > key.getStartTime() && course.getEndTime() < key.getEndTime()){
+                    return true;
+                }
+                else if(course.getStartTime() < key.getStartTime() && course.getEndTime() > key.getEndTime()){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
