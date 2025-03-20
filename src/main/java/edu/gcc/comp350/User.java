@@ -16,19 +16,17 @@ public class User {
     private int userID;
     private byte[] passwordHash;
     private byte[] salt;
-    private int numSchedulesCreated;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, int userID) {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
         this.schedules = new ArrayList<Schedule>();
-        numSchedulesCreated = 0;
+        this.userID = userID;
     }
 
     public void addSchedule(Schedule schedule) {
         schedules.add(schedule);
-        numSchedulesCreated++;
     }
 
     public void deleteSchedule(Schedule schedule) {
@@ -41,7 +39,7 @@ public class User {
     }
 
     public int getNumSchedulesCreated() {
-        return numSchedulesCreated;
+        return schedules.size();
     }
 
     public ArrayList<Schedule> getSchedules() {
@@ -92,7 +90,6 @@ public class User {
     public byte[] getPasswordHash() {
         return passwordHash;
     }
-
 
     public void setPasswordHash(String password) {
         SecureRandom random = new SecureRandom();
