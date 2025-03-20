@@ -67,14 +67,15 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
-    public ArrayList<Course> GetCoursesSearch(Search search){
+    public Search GetCoursesSearch(Search search){
         ArrayList<Course> retCourses = new ArrayList<>();
         for(Course course : courses){
             if (CourseContainsKeywords(course, search.getKeywords())){
                 retCourses.add(course);
             }
         }
-        return retCourses;
+        search.SetResults(retCourses);
+        return search;
     }
 
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
