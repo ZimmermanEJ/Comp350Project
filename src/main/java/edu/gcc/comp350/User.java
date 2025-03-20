@@ -15,9 +15,8 @@ public class User {
     private int userID;
     private byte[] passwordHash;
     private byte[] salt;
-    private int numSchedulesCreated;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, int userID) {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
@@ -25,7 +24,7 @@ public class User {
     }
 
     public int getNumSchedulesCreated() {
-        return numSchedulesCreated;
+        return schedules.size();
     }
 
 
@@ -64,7 +63,6 @@ public class User {
     public byte[] getPasswordHash() {
         return passwordHash;
     }
-
 
     public void setPasswordHash(String password) {
         SecureRandom random = new SecureRandom();

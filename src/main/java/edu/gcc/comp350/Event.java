@@ -12,7 +12,12 @@ public class Event {
     private int eventID;
 
     public Event(String name, boolean[] days, double startTime, double endTime, String description){
-
+        this.name = name;
+        this.days = days;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.description = description;
+        this.eventID = 0;
     }
 
     public String getName() {
