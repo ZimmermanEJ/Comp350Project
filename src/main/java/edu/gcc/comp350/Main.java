@@ -372,8 +372,9 @@ public class Main {
                             String startTime = "";
                             String endTime = "";
 
-//                            if(filter.equalsIgnoreCase("quit")){
-//                                break;
+                            if(filter.equalsIgnoreCase("quit")) {
+                                break;
+                            }
 //                            } else if (filter.equalsIgnoreCase("none")) {
 //                                f = new Filter(0, "", 0, 'A', "", 0, 0, s);
 //
