@@ -31,7 +31,9 @@ public class Schedule {
         events.put(event, "Blue");
     }
 
-    public void removeEvent(Event event) { }
+    public void removeEvent(Event event) {
+        events.remove(event);
+    }
 
     public boolean hasConflict(Course course) {
         return false;
@@ -96,6 +98,16 @@ public class Schedule {
             }
             toReturn.append("\n");
         }
+        // Print out the events at the bottom
+        if (!this.getEvents().isEmpty()) {
+            toReturn.append("Events:\n");
+            for (Event event : this.getEvents().keySet()) {
+                toReturn.append(event.toString()).append("\n");
+            }
+        } else {
+            toReturn.append("No events scheduled\n");
+        }
+
 
         return toReturn.toString();
     }

@@ -127,7 +127,7 @@ public class Main {
                 } else if (currentUser.getSchedules().isEmpty()) { // user doesn't have any schedule to open
                     System.out.println("You don't have any existing schedules, try creating one.");
                     continue;
-                } else if (scheduleInput.equalsIgnoreCase("delete")){
+                } else if (scheduleInput.equalsIgnoreCase("delete")) {
                     System.out.print("Enter the ID of the schedule to delete (or 'quit'): ");
                     scheduleInput = scanner.nextLine();
                     if (scheduleInput.equalsIgnoreCase("quit")) {
@@ -187,14 +187,14 @@ public class Main {
                     if (nextAction.equalsIgnoreCase("quit")) {
                         break;
                     } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
-                        System.out.println(currentSchedule.scheduleView());
                         while (true) {
+                            System.out.println(currentSchedule.scheduleView());
                             System.out.print("Enter 'e' to add event, 'rc' to remove a course, 're' to remove an event, or 'quit': ");
                             String next = scanner.nextLine();
 
                             if (next.equalsIgnoreCase("quit")) {
                                 break;
-                            } else if (next.equalsIgnoreCase("e")){
+                            } else if (next.equalsIgnoreCase("e")) {
                                 // Add event
                                 System.out.print("Event name: ");
                                 String name = scanner.nextLine();
@@ -206,7 +206,7 @@ public class Main {
                                         System.out.print("Is the event on " + day + "? ('y' or 'n'): ");
                                         String response = scanner.nextLine();
                                         if (response.equalsIgnoreCase("y")) {
-                                            days[i]= true;
+                                            days[i] = true;
                                             break;
                                         } else if (response.equalsIgnoreCase("n")) {
                                             break;
@@ -248,9 +248,9 @@ public class Main {
                                 Event e = new Event(name, days, startT, endT, description);
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
-                            } else if (next.equalsIgnoreCase("rc")){
+                            } else if (next.equalsIgnoreCase("rc")) {
                                 // TODO: remove course
-                            } else if (next.equalsIgnoreCase("re")){
+                            } else if (next.equalsIgnoreCase("re")) {
                                 // TODO: remove event
                             } else {
                                 System.out.println("Input not recognized, try again");
