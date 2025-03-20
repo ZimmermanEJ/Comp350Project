@@ -20,7 +20,6 @@ public class Schedule {
     }
 
     public boolean addCourse(Course course) {
-        // TODO: check for conflicts
         if(hasConflict(course)) {
             return false;
         }else {
