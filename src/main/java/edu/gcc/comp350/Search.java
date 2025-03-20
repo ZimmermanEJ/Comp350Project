@@ -8,7 +8,7 @@ public class Search {
     private ArrayList<Course> searchResults;
 
     public Search(ArrayList<String> keywords) {
-
+        this.keywords = keywords;
     }
     public void SetResults(ArrayList<Course> courses) {
         searchResults = courses;

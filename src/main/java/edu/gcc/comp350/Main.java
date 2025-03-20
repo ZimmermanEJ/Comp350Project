@@ -76,6 +76,8 @@ public class Main {
                         break;
                     }
                 }
+                continue;
+
             } else if (nextInput.equalsIgnoreCase("signup")) {
                 String name;
                 String email;
@@ -301,7 +303,7 @@ public class Main {
 
                         System.out.println("Searched for " + search);
                         // TODO: Make search object
-                        Search s = new Search(keywords);
+                        Search s = data.GetCoursesSearch(new Search(keywords));
                         // TODO: Make a filter object
                         Filter f;
                         while (true) {
@@ -370,38 +372,44 @@ public class Main {
                             if(startTime.isEmpty()){
                                 startTime = "0";
                             }
+
                             if(endTime.isEmpty()){
                                 endTime = "0";
+                            }
+                            if(section.isEmpty()){
+                                section = " ";
                             }
                             //Creates a filter with the provided criteria
                             f = new Filter(Integer.parseInt(credits), department, Integer.parseInt(courseNumber), section.charAt(0), days, Integer.parseInt(startTime), Integer.parseInt(endTime), s);
 
-//                            if (filter.equalsIgnoreCase("quit")) {
-//                                break;
-//                            } else if (filter.equalsIgnoreCase("c")) {
-//                                System.out.print("Enter credit filter: ");
-//                                credits = scanner.nextLine();
-//                                // TODO: Make a copy of 'f' and update credits
-//                            } else if (filter.equalsIgnoreCase("dep")) {
-//                                System.out.print("Enter department filter: ");
-//                                department = scanner.nextLine();
-//                                // TODO: Make a copy of 'f' and update department
-//                            } else if (filter.equalsIgnoreCase("d")) {
-//                                System.out.print("Enter days filter ('MWF' or 'TR'): ");
-//                                days = scanner.nextLine();
-//                                // TODO: Make a copy of 'f' and update days
-//                            } else if (filter.equalsIgnoreCase("s")) {
-//                                System.out.print("Enter start time filter: ");
-//                                startTime = scanner.nextLine();
-//                                // TODO: Make a copy of 'f' and update startTime
-//                            } else if (filter.equalsIgnoreCase("e")) {
-//                                System.out.print("Enter end time filter: ");
-//                                endTime = scanner.nextLine();
-//                                // TODO: Make a copy of 'f' and update endTime
-//                            } else {
-//                                System.out.print("Invalid input, try again");
-//                            }
-//                            f = new Filter()
+                            System.out.println("Here are the filtered results!");
+                            for (Course course : f.getFilteredResults()) {
+                                System.out.println(course.toString());
+                            }
+                            while(true) {
+                                System.out.println("Would you like to add a course to your schedule? ('y' or 'n')");
+                                Scanner addCourse = new Scanner(System.in);
+                                String answer = addCourse.nextLine();
+                                if(answer.equalsIgnoreCase("y")){
+                                    System.out.println("Enter the reference number of the course you would like to add: ");
+                                    int refNum = addCourse.nextInt();
+                                    for (int i = 0; i < f.getFilteredResults().size(); i++) {
+                                        if(f.getFilteredResults().get(i).getReferenceNumber() == refNum){
+                                            if(currentSchedule.addCourse(f.getFilteredResults().get(i))){
+                                                System.out.println("Course added to schedule");
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if(answer.equalsIgnoreCase("n")){
+                                    break;
+                                }
+                                else{
+                                    System.out.println("Invalid input, try again");
+                                }
+                            }
+//
                         }
 
                     } else { // invalid input
