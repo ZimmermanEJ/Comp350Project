@@ -60,8 +60,8 @@ public class Event {
         // string builder to return event in the form name ID: eventID startTime - endTime SMTWRFS
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(" ID: ").append(eventID).append(" ");
-        sb.append((((startTime-1) % 12) + 1)).append(startTime <= 11 ? "AM" :"PM").append(" - ");
-        sb.append(((endTime-1) % 12) + 1).append(endTime <= 11 ? "AM" :"PM").append(" ");
+        sb.append(String.format("%.2f", ((startTime-1) % 12) + 1)).append(startTime <= 11 ? "AM" :"PM").append(" - ");
+        sb.append(String.format("%.2f", ((endTime-1) % 12) + 1)).append(endTime <= 11 ? "AM" :"PM").append(" ");
         for (int i = 0; i < days.length; i++) {
             if (days[i]) {
                 sb.append("SMTWRFS".charAt(i));

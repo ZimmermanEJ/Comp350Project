@@ -29,17 +29,29 @@ public class Schedule {
         }
     }
 
-    public void removeCourse(Course course) {
-        courses.remove(course);
+    public boolean removeCourse(int refNum) {
+        System.out.println(courses.size());
+        for (Course c: courses.keySet()) {
+            if (c.getReferenceNumber() == refNum) {
+                courses.remove(c);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addEvent(Event event) {
-
         events.put(event, "Blue");
     }
 
-    public void removeEvent(Event event) {
-        events.remove(event);
+    public boolean removeEvent(int eventID) {
+        for (Event e: events.keySet()) {
+            if (e.getEventID() == eventID) {
+                events.remove(e);
+                return true;
+            }
+        }
+        return false;
     }
 
    /**
@@ -104,11 +116,11 @@ public class Schedule {
                     if (day.length == 2 && hour >= day[0] && hour < day[1]) {
                         if (i == 1 || i == 3 || i == 5) {
                             toReturn.append(course.getTitle()).append("\t");
-                            toReturn.append("ID: ").append(course.getCourseID()).append("\t");
+                            toReturn.append("# ").append(course.getReferenceNumber()).append("\t");
                             toReturn.append(String.format("%.2f", ((day[0]-1) % 12) + 1)).append(" - ").append(String.format("%.2f", ((day[1]-1) % 12) + 1));
                         } else if (i == 2 || i == 4) {
                             toReturn.append(course.getTitle()).append("\t");
-                            toReturn.append("ID: ").append(course.getCourseID()).append("\t");
+                            toReturn.append("# ").append(course.getReferenceNumber()).append("\t");
                             toReturn.append(String.format("%.2f", ((day[0]-1) % 12) + 1)).append(" - ").append(String.format("%.2f", ((day[1]-1) % 12) + 1));
                         }
                     }
