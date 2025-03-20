@@ -56,6 +56,19 @@ public class Filter {
         }
 
     }
+    /**
+     * Checks if the given course matches the specified filter criteria.
+     *
+     * @param course       the course to check against the filter criteria
+     * @param credits      the number of credits for the course
+     * @param department   the department offering the course
+     * @param courseNumber the course number
+     * @param sectionCode  the section code
+     * @param d            the days the class is held
+     * @param startTime    the start time of the course
+     * @param endTime      the end time of the course
+     * @return boolean     true if the course matches the filter criteria, false otherwise
+     */
     public boolean helper(Course course, int credits, String department, int courseNumber, char sectionCode, Days d, double startTime, double endTime) {
         if (course.getCredits() != credits && credits != 0) {
             return false;

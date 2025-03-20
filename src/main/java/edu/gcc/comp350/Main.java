@@ -374,6 +374,7 @@ public class Main {
                             if(endTime.isEmpty()){
                                 endTime = "0";
                             }
+                            //Creates a filter with the provided criteria
                             f = new Filter(Integer.parseInt(credits), department, Integer.parseInt(courseNumber), section.charAt(0), days, Integer.parseInt(startTime), Integer.parseInt(endTime), s);
 
 //                            if (filter.equalsIgnoreCase("quit")) {
