@@ -8,7 +8,6 @@ import java.security.spec.KeySpec;
 import java.util.ArrayList;
 
 public class User {
-    private ArrayList<Schedule> schedules;
     private String name;
     private String major;
     private int year;
@@ -21,39 +20,13 @@ public class User {
         this.name = name;
         this.email = email;
         setPasswordHash(password);
-        this.schedules = new ArrayList<Schedule>();
-        this.userID = userID;
-    }
-
-    public void addSchedule(Schedule schedule) {
-        schedules.add(schedule);
-    }
-
-    public void deleteSchedule(Schedule schedule) {
-        for (Schedule s : schedules) {
-            if (schedule.getScheduleID() == s.getScheduleID()) {
-                schedules.remove(s);
-                break;
-            }
-        }
+        numSchedulesCreated = 0;
     }
 
     public int getNumSchedulesCreated() {
         return schedules.size();
     }
 
-    public ArrayList<Schedule> getSchedules() {
-        return schedules;
-    }
-
-    public Schedule getSchedule(int scheduleID) {
-        for (Schedule s : schedules) {
-            if (scheduleID == s.getScheduleID()) {
-                return s;
-            }
-        }
-        return null;
-    }
 
     public String getName() {
         return name;

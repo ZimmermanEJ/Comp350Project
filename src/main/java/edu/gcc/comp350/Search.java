@@ -10,6 +10,9 @@ public class Search {
     public Search(ArrayList<String> keywords) {
 
     }
+    public Search(ArrayList<String> keywords, ArrayList<Course> searchResults){
+
+    }
 
     public ArrayList<String> getKeywords() {
         return keywords;
