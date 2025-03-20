@@ -25,9 +25,7 @@ public class Main {
 
 
         // arraylist used for storing users with fake user added for testing
-        ArrayList<User> users = new ArrayList<>();
-        User tempUser = new User("Temp", "a@a.com", "pw");
-        users.add(tempUser);
+        User user = new User("Temp", "a@a.com", "pw", 0);
         // Course used for testing
         double[][] time = {{}, {14, 14.5}, {}, {14, 14.5}, {}, {14, 14.5}, {}};
         Course softwareEngineeringA = new Course("COMP", 350,
@@ -59,12 +57,10 @@ public class Main {
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
-                    for (User s : users) {
-                        if (s.getEmail().equalsIgnoreCase(email)) {
-                            if (Arrays.equals(s.getPasswordHash(), s.hash(password))) {
-                                currentUser = s;
-                                break;
-                            }
+                    if (user.getEmail().equalsIgnoreCase(email)) {
+                        if (Arrays.equals(user.getPasswordHash(), user.hash(password))) {
+                            currentUser = user;
+                            break;
                         }
                     }
                     if (currentUser == null) {
@@ -80,8 +76,7 @@ public class Main {
                 String email = scanner.nextLine();
                 System.out.print("Enter password: ");
                 String password = scanner.nextLine();
-                User newUser = new User(name, email, password);
-                users.add(newUser);
+                User newUser = new User(name, email, password, 0);
                 currentUser = newUser;
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
