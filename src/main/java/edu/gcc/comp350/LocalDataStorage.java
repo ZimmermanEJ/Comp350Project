@@ -9,9 +9,9 @@ import com.google.gson.reflect.TypeToken;
 
 public class LocalDataStorage implements IDataConnection {
 
-    List<User> users;
-    List<Schedule> schedules;
-    List<Course> courses;
+    ArrayList<User> users;
+    ArrayList<Schedule> schedules;
+    ArrayList<Course> courses;
     File usersFile;
     File schedulesFile;
     File courseFile;
@@ -22,19 +22,46 @@ public class LocalDataStorage implements IDataConnection {
         schedulesFile = new File(schedulesPath);
         courseFile = new File(coursePath);
         Gson gson = new Gson();
+        // users
         try {
             FileReader usersReader = new FileReader(usersFile);
-            FileReader schedulesReader = new FileReader(schedulesFile);
-            FileReader courseReader = new FileReader(courseFile);
-            users = gson.fromJson(usersReader.toString(),new TypeToken<List<User>>(){}.getType());
-            schedules = gson.fromJson(schedulesReader.toString(),new TypeToken<List<Schedule>>(){}.getType());
-            courses = gson.fromJson(courseReader.toString(),new TypeToken<List<Course>>(){}.getType());
-
+            users = gson.fromJson(usersReader,new TypeToken<ArrayList<User>>(){}.getType());
+            usersReader.close();
         }
         catch (FileNotFoundException ex){
             System.out.println(ex.getMessage());
             users = new ArrayList<>();
+        }
+        catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            courses = new ArrayList<>();
+        }
+        // schedules
+        try {
+            FileReader schedulesReader = new FileReader(schedulesFile);
+            schedules = gson.fromJson(schedulesReader, new TypeToken<List<Schedule>>() {}.getType());
+            schedulesReader.close();
+        }
+        catch (FileNotFoundException ex){
+            System.out.println(ex.getMessage());
             schedules = new ArrayList<>();
+        }
+        catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            courses = new ArrayList<>();
+        }
+        // courses
+        try{
+            FileReader courseReader = new FileReader(courseFile);
+            courses = gson.fromJson(courseReader,new TypeToken<List<Course>>(){}.getType());
+            courseReader.close();
+        }
+        catch (FileNotFoundException ex){
+            System.out.println(ex.getMessage());
+            courses = new ArrayList<>();
+        }
+        catch (IOException ex) {
+            System.out.println(ex.getMessage());
             courses = new ArrayList<>();
         }
     }
@@ -50,7 +77,7 @@ public class LocalDataStorage implements IDataConnection {
         return new Search(search.getKeywords(),retCourses);
     }
 
-    private boolean CourseContainsKeywords(Course course, List<String> keywords){
+    private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
         for (String keyword : keywords){
             if (!course.getDescription().contains((keyword))){
                 return false;
@@ -83,6 +110,25 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
+    public User GetUserByEmail(String email){
+        for (User user: users){
+            if (user.getEmail().equalsIgnoreCase(email)){
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public User CreateNewUser(User user){
+        if (GetUserByEmail(user.getEmail())==null){
+            users.add(user);
+            return user;
+        }
+        return null;
+    }
+
+    @Override
     public Course GetCourseByName(String name){
         for (Course course: courses){
             String courseName = course.getDepartment() + " " + course.getCourseID() + course.getSectionCode();
@@ -94,8 +140,8 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
-    public List<Schedule> GetUserIdSchedules(int userID){
-        List<Schedule> userSchedules = new ArrayList<>();
+    public ArrayList<Schedule> GetUserIdSchedules(int userID){
+        ArrayList<Schedule> userSchedules = new ArrayList<>();
         for (Schedule schedule: schedules){
             if (schedule.getUserID()==userID){
                 userSchedules.add(schedule);
@@ -115,15 +161,31 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
+    public boolean DeleteSchedule(Schedule schedule){
+        Schedule target = GetScheduleId(schedule.getScheduleID());
+        if (target != null) {
+            schedules.remove(target);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void CloseConnection(){
         Gson gson = new GsonBuilder().create();
         try {
+            System.out.println(users);
+            System.out.println(schedules);
             FileWriter usersWriter = new FileWriter(usersFile);
             FileWriter schedulesWriter = new FileWriter(schedulesFile);
-            gson.toJson(users, usersWriter);
-            gson.toJson(schedules, schedulesWriter);
+            usersWriter.write(gson.toJson(users, new TypeToken<ArrayList<User>>() {}.getType()));
+            schedulesWriter.write(gson.toJson(schedules, new TypeToken<ArrayList<Schedule>>() {}.getType()));
+            usersWriter.close();
+            schedulesWriter.close();
+
         }
         catch (IOException ex){
+            System.out.println("Error saving data");
             System.out.println(ex.getMessage());
         }
     }

@@ -11,6 +11,7 @@ public class Main {
     }
     public static void run() {
 
+        IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
         // structure of I/O
 
         // login
@@ -22,9 +23,8 @@ public class Main {
         // signup
 
         // arraylist used for storing users with fake user added for testing
-        ArrayList<User> users = new ArrayList<>();
         User tempUser = new User("Temp", "a@a.com", "pw");
-        users.add(tempUser);
+        data.CreateNewUser(tempUser);
         // Course used for testing
         double[][] time = {{}, {2, 2.5}, {}, {2, 2.5}, {}, {2, 2.5}, {}};
         Course softwareEngineeringA = new Course("COMP", 350,
@@ -38,7 +38,7 @@ public class Main {
         while (true) {
             System.out.print("Enter 'login', 'signup', or 'quit': ");
             String nextInput = scanner.nextLine();
-
+            ArrayList<Schedule> schedules;
             if (nextInput.equalsIgnoreCase("login")) {
                 while (true) {
                     System.out.print("Enter email: ");
@@ -46,17 +46,11 @@ public class Main {
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
-                    for (User s : users) {
-                        if (s.getEmail().equalsIgnoreCase(email)) {
-                            if (Arrays.equals(s.getPasswordHash(), s.hash(password))) {
-                                currentUser = s;
-                                break;
-                            }
-                        }
-                    }
+                    currentUser = data.GetUserByEmail(email);
                     if (currentUser == null) {
                         System.out.println("Invalid credentials");
                     } else {
+                        schedules = data.GetUserIdSchedules(currentUser.getUserID());
                         break;
                     }
                 }
@@ -68,25 +62,25 @@ public class Main {
                 System.out.print("Enter password: ");
                 String password = scanner.nextLine();
                 User newUser = new User(name, email, password);
-                users.add(newUser);
+                data.CreateNewUser(newUser);
                 currentUser = newUser;
+                schedules = data.GetUserIdSchedules(currentUser.getUserID());
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
             } else {
                 System.out.println("Invalid input, try again");
                 continue;
             }
-
             String scheduleInput = "";
             while (true) { // loop until user quits
                 System.out.println("\nWelcome " + currentUser.getName() + "!");
 
                 // show schedules
-                if (currentUser.getSchedules().isEmpty()) {
+                if (schedules.isEmpty()) {
                     System.out.println("You don't have any schedules.");
                 } else {
                     System.out.println("Here are your schedules:");
-                    for (Schedule schedule : currentUser.getSchedules()) {
+                    for (Schedule schedule : schedules) {
                         System.out.println(schedule.listView());
                     }
 
@@ -102,37 +96,38 @@ public class Main {
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
                     Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, currentUser.getNumSchedulesCreated());
-                    currentUser.addSchedule(mySchedule);
+                    schedules.add(mySchedule);
 
                     mySchedule.addCourse(softwareEngineeringA);
-
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
                     break;
-                } else if (currentUser.getSchedules().isEmpty()) { // user doesn't have any schedule to open
+                } else if (schedules.isEmpty()) { // user doesn't have any schedule to open
                     System.out.println("You don't have any existing schedules, try creating one.");
                     continue;
                 } else if (scheduleInput.equalsIgnoreCase("delete")){
                     System.out.print("Enter the ID of the schedule to delete (or 'quit'): ");
                     scheduleInput = scanner.nextLine();
                     if (scheduleInput.equalsIgnoreCase("quit")) {
+                        data.SaveSchedule(currentSchedule);
                         continue;
                     }
                     try { //
                         int scheduleID = Integer.parseInt(scheduleInput);
 
-                        ArrayList<Schedule> schedules = currentUser.getSchedules();
                         boolean deleted = false;
                         for (Schedule schedule : schedules) {
                             if (schedule.getScheduleID() == scheduleID) { // schedule exists
-                                currentUser.deleteSchedule(schedule);
-                                deleted = true;
+                                deleted = data.DeleteSchedule(schedule);
                                 System.out.println("Schedule " + schedule.getScheduleID() + " successfully deleted");
                                 break;
                             }
                         }
                         if (!deleted) { // schedule does not exist
                             System.out.println("No schedule " + scheduleInput);
+                        }
+                        else {
+                            schedules.remove(scheduleID);
                         }
                         continue;
                     } catch (NumberFormatException e) { // didn't input a number
@@ -143,7 +138,6 @@ public class Main {
                     try { //
                         int scheduleID = Integer.parseInt(scheduleInput);
 
-                        ArrayList<Schedule> schedules = currentUser.getSchedules();
                         boolean assigned = false;
                         for (Schedule schedule : schedules) {
                             if (schedule.getScheduleID() == scheduleID) { // schedule exists
@@ -170,6 +164,7 @@ public class Main {
                     String nextAction = scanner.nextLine();
 
                     if (nextAction.equalsIgnoreCase("quit")) {
+                        data.SaveSchedule(currentSchedule);
                         break;
                     } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
                         System.out.println(currentSchedule.scheduleView());
@@ -295,5 +290,6 @@ public class Main {
             }
         }
         System.out.println("Exiting");
+        data.CloseConnection();
     }
 }
