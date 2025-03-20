@@ -106,4 +106,8 @@ public class Course {
     public int getCourseID() {
         return courseID;
     }
+
+    public String toString(){
+        return department + " " + courseNumber + sectionCode + " - " + title + ": " + "Course Code: " + referenceNumber;
+    }
 }

@@ -43,14 +43,16 @@ public class Filter {
             this.startTime = startTime;
             this.endTime = endTime;
             this.search = search;
+            this.filteredResults = search.getSearchResults();
 
-        for (int i = 0; i < search.getSearchResults().size(); i++) {
-           if(helper(search.getSearchResults().get(i), credits, department, courseNumber, sectionCode, d, startTime, endTime)){
-               filteredResults.add(search.getSearchResults().get(i));
-           }
-        }
+//        for (int i = 0; i < search.getSearchResults().size(); i++) {
+//           if(helper(search.getSearchResults().get(i), credits, department, courseNumber, sectionCode, d, startTime, endTime)){
+//               filteredResults.add(search.getSearchResults().get(i));
+//           }
+//        }
+
         for (int i = 0; i < filteredResults.size(); i++) {
-            if(helper(filteredResults.get(i), credits, department, courseNumber, sectionCode, d, startTime, endTime)){
+            if(!helper(filteredResults.get(i), credits, department, courseNumber, sectionCode, d, startTime, endTime)){
                 filteredResults.remove(i);
             }
         }
