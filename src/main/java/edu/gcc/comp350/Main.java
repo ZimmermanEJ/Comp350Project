@@ -68,7 +68,7 @@ public class Main {
                     String password = scanner.nextLine();
 
                     currentUser = data.GetUserByEmail(email);
-                    if (currentUser == null) {
+                    if (currentUser == null || !Arrays.equals(currentUser.getPasswordHash(), currentUser.hash(password))) {
                         System.out.println("Invalid credentials");
                         failedAttempts++;
                     } else {
@@ -124,19 +124,8 @@ public class Main {
             while (true) { // loop until user quits
                 System.out.println("\nWelcome " + currentUser.getName() + "!");
 
-                // show schedules
-                if (schedules.isEmpty()) {
-                    System.out.println("You don't have any schedules.");
-                } else {
-                    System.out.println("Here are your schedules:");
-                    for (Schedule schedule : schedules) {
-                        System.out.println(schedule.listView());
-                    }
-
-                }
-
                 // user opens a schedule
-                System.out.print("Enter the schedule id you would like to open, or 'new', or 'delete' (or 'quit'): ");
+                System.out.print("Enter the schedule id you would like to open, or 'show schedules', 'new', or 'delete' (or 'quit'): ");
                 scheduleInput = scanner.nextLine();
                 Schedule currentSchedule = null; // schedule to open
 
@@ -154,6 +143,16 @@ public class Main {
                 } else if (schedules.isEmpty()) { // user doesn't have any schedule to open
                     System.out.println("You don't have any existing schedules, try creating one.");
                     continue;
+                } else if (scheduleInput.equalsIgnoreCase("show schedules")) {  // show schedules
+                    if (schedules.isEmpty()) {
+                        System.out.println("You don't have any schedules.");
+                    } else {
+                        System.out.println("Here are your schedules:");
+                        for (Schedule schedule : schedules) {
+                            System.out.println(schedule.listView());
+                        }
+
+                    }
                 } else if (scheduleInput.equalsIgnoreCase("delete")){
                     System.out.print("Enter the ID of the schedule to delete (or 'quit'): ");
                     scheduleInput = scanner.nextLine();
