@@ -29,8 +29,7 @@ public class Schedule {
     }
 
     public boolean removeCourse(int refNum) {
-        System.out.println(courses.size());
-        for (int c: courses) {
+        for (Integer c: courses) {
             if (c == refNum) {
                 courses.remove(c);
                 return true;

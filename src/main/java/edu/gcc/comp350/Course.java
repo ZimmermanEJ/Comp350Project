@@ -108,6 +108,6 @@ public class Course {
     }
 
     public String toString(){
-        return department + " " + courseNumber + sectionCode + " - " + title + " " + String.format("%.2f", ((startTime-1) % 12) + 1) + " - " + String.format("%.2f", ((endTime-1) % 12) + 1) + days + " #" + referenceNumber;
+        return department + " " + courseNumber + sectionCode + " - " + title + " " + String.format("%.2f", ((startTime-1) % 12) + 1) + " - " + String.format("%.2f", ((endTime-1) % 12) + 1) + " " + days + " #" + referenceNumber;
     }
 }

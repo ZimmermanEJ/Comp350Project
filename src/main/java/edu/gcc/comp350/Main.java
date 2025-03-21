@@ -270,13 +270,12 @@ public class Main {
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
                             } else if (next.equalsIgnoreCase("rc")){
-                                System.out.println(currentSchedule.getCourses());
                                 System.out.print("Enter the reference # of course to be removed: ");
                                 String course = scanner.nextLine();
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
-                                        System.out.println("Course " + refNum + "removed");
+                                        System.out.println("Course " + refNum + " removed");
                                     } else {
                                         System.out.println("Course not found");
                                     }
