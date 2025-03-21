@@ -32,27 +32,27 @@ public class JsonConverter {
                 }
                 double startTime = 0;
                 double endTime = 0;
-                double[][] timeSlots = new double[5][2];
-                int slotoffset = 0;
+                double[][] timeSlots = new double[7][2];
+                int slotoffset = 1;
                 Course.Days days = Course.Days.MWF;
 
                 for (int i = 0; i<oc.times.length; i++){
                     switch (oc.times[i].day){
                         case 'M':
-                            slotoffset = 0;
+                            slotoffset = 1;
                             break;
                         case 'T':
-                            slotoffset = 1;
+                            slotoffset = 2;
                             days = Course.Days.TR;
                             break;
                         case 'W':
-                            slotoffset = 2;
-                            break;
-                        case 'R':
                             slotoffset = 3;
                             break;
-                        case 'F':
+                        case 'R':
                             slotoffset = 4;
+                            break;
+                        case 'F':
+                            slotoffset = 5;
                             break;
                     }
                     if (oc.times[i].start_time !=null) {
