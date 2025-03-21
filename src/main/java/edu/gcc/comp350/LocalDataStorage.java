@@ -98,16 +98,16 @@ public class LocalDataStorage implements IDataConnection {
 
     @Override
     public Schedule SaveSchedule(Schedule schedule){
-        try {
-            for (int i = 0; i < schedules.size(); i++) {
-                if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
-                        && schedules.get(i).getUserID() == schedule.getUserID()) {
-                    schedules.set(i, schedule);
-                    return schedule;
-                }
+        boolean scheduleAdded = false;
+        for (int i = 0; i < schedules.size(); i++) {
+            if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
+                    && schedules.get(i).getUserID() == schedule.getUserID()) {
+                scheduleAdded = true;
+                schedules.set(i, schedule);
+                return schedule;
             }
         }
-        catch (Exception ignored){
+        if (!scheduleAdded){
             this.schedules = new ArrayList<>();
             schedules.add(schedule);
         }
