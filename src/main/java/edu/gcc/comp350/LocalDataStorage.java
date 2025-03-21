@@ -98,8 +98,8 @@ public class LocalDataStorage implements IDataConnection {
                 }
             }
         }
-        catch (Exception ignored){
-            this.schedules = new ArrayList<>();
+        catch (Exception e){
+            schedules = new ArrayList<>();
             schedules.add(schedule);
         }
 
@@ -118,17 +118,27 @@ public class LocalDataStorage implements IDataConnection {
 
     @Override
     public User GetUserByEmail(String email){
-        for (User user: users){
-            if (user.getEmail().equalsIgnoreCase(email)){
-                return user;
+        try {
+            for (User user : users) {
+                if (user.getEmail().equalsIgnoreCase(email)) {
+                    return user;
+                }
             }
+        }catch (Exception ignored){
         }
         return null;
     }
 
     @Override
     public User CreateNewUser(User user){
-        if (GetUserByEmail(user.getEmail())==null){
+        try {
+            if (GetUserByEmail(user.getEmail()) == null) {
+                users.add(user);
+                user.setUserID(users.size());
+                return user;
+            }
+        } catch (Exception ingored){
+            this.users = new ArrayList<>();
             users.add(user);
             user.setUserID(users.size());
             return user;
