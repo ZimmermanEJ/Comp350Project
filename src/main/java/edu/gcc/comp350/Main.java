@@ -335,18 +335,15 @@ public class Main {
                         //temporary search results
 
 
-//                        Search s = data.GetCoursesSearch(new Search(keywords));
+
 
 
 
 
 
                         while (true) {
-                            ArrayList<Course> example = new ArrayList<>();
-                            example.add(softwareEngineeringA);
-                            example.add(discrete);
-                            example.add(OS);
-                            Search s = new Search(example);
+                            Search s = data.GetCoursesSearch(new Search(keywords));
+
                             Filter f;
                             boolean skip = false;
                             System.out.println("Here are your search results!\n");
@@ -355,7 +352,7 @@ public class Main {
                             }
 
                             System.out.println("\nFilters: Enter the filters you would like with a space in between, 'c' for credits, 'dep' for department, 'cn' for course number, 'cs' for course section, 'd' for days, 's' for start time, or 'e' for end time: ");
-                            System.out.println("If you would not like any filters, type 'none'. If you would like to quit, type 'quit'");
+                            System.out.println("If you would not like any filters, type nothing. If you would like to quit, type 'quit'");
                             String filter = scanner.nextLine();
                             Scanner filterScanner = new Scanner(filter);
                             ArrayList<String> filters = new ArrayList<>();
@@ -406,9 +403,6 @@ public class Main {
                                     endTime = scanner.nextLine();
 
                                 }
-                                else if(f1.equalsIgnoreCase("none")) {
-                                    //do nothing
-                                }
                                 else {
                                     System.out.println("Invalid input, try again");
                                     skip = true;
@@ -433,7 +427,7 @@ public class Main {
                                     section = " ";
                                 }
                                 //Creates a filter with the provided criteria
-                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Integer.parseInt(startTime), Integer.parseInt(endTime), s);
+                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Double.parseDouble(startTime), Double.parseDouble(endTime), s);
 
                                 System.out.println("Here are the filtered results!\n");
                                 for (Course course : f.getFilteredResults()) {
@@ -444,12 +438,15 @@ public class Main {
                                     Scanner addCourse = new Scanner(System.in);
                                     String answer = addCourse.nextLine();
                                     if (answer.equalsIgnoreCase("y")) {
-                                        System.out.println("Enter the reference number of the course you would like to add: \n");
-                                        int refNum = addCourse.nextInt();
+                                        System.out.println("Enter the course code of the course you would like to add: \n");
+                                        int code = addCourse.nextInt();
+                                        System.out.println("Enter the section code of the course you would like to add: \n");
+                                        String sectionCode = addCourse.next();
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
-                                            if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
+                                            if (f.getFilteredResults().get(i).getCourseNumber() == code && f.getFilteredResults().get(i).getSectionCode() == sectionCode.charAt(0)) {
                                                 if (currentSchedule.addCourse(f.getFilteredResults().get(i))) {
                                                     System.out.println("Course added to schedule!");
+                                                    break;
                                                 }
                                                 break;
                                             }
