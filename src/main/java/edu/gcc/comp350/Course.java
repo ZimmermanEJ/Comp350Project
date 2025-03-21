@@ -108,6 +108,6 @@ public class Course {
     }
 
     public String toString(){
-        return department + " " + courseNumber + sectionCode + " - " + title;
+        return department + " " + courseNumber + sectionCode + " - " + title + " #" + referenceNumber;
     }
 }

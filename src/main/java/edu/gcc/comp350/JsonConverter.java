@@ -21,8 +21,9 @@ public class JsonConverter {
 
 
 
-
+            int refNum = 0;
             for (OriginalCourse oc: originalCourses){
+                refNum++;
                 StringBuilder build = new StringBuilder();
                 for (int i = 0; i < oc.faculty.length; i++){
                     build.append(oc.faculty[i]);
@@ -32,27 +33,27 @@ public class JsonConverter {
                 }
                 double startTime = 0;
                 double endTime = 0;
-                double[][] timeSlots = new double[5][2];
+                double[][] timeSlots = new double[7][2];
                 int slotoffset = 0;
                 Course.Days days = Course.Days.MWF;
 
                 for (int i = 0; i<oc.times.length; i++){
                     switch (oc.times[i].day){
                         case 'M':
-                            slotoffset = 0;
+                            slotoffset = 1;
                             break;
                         case 'T':
-                            slotoffset = 1;
+                            slotoffset = 2;
                             days = Course.Days.TR;
                             break;
                         case 'W':
-                            slotoffset = 2;
-                            break;
-                        case 'R':
                             slotoffset = 3;
                             break;
-                        case 'F':
+                        case 'R':
                             slotoffset = 4;
+                            break;
+                        case 'F':
+                            slotoffset = 5;
                             break;
                     }
                     if (oc.times[i].start_time !=null) {
@@ -72,7 +73,7 @@ public class JsonConverter {
 
 
 
-                Course nc = new Course(oc.subject, oc.number, oc.section, oc.name, oc.credits, "TBD", build.toString(), 0, days, startTime, endTime, timeSlots);
+                Course nc = new Course(oc.subject, oc.number, oc.section, oc.name, oc.credits, "TBD", build.toString(), refNum, days, startTime, endTime, timeSlots);
                 courses.add(nc);
             }
             FileWriter writer = new FileWriter("courses.json");
