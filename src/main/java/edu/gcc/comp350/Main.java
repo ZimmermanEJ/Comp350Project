@@ -86,10 +86,12 @@ public class Main {
                 while(true) {
                     System.out.print("Enter email: ");
                     email = scanner.nextLine();
+                    currentUser = data.GetUserByEmail(email);
                     if (Objects.equals(email, "")) {
                         System.out.println("Please enter an email");
-                    }
-                    else{
+                    } else if (currentUser != null) {
+                        System.out.println("Please enter an unused email");
+                    } else{
                         break;
                     }
                 }
@@ -103,6 +105,7 @@ public class Main {
                         break;
                     }
                 }
+
               User newUser = new User(name, email, password);
               data.CreateNewUser(newUser);
               currentUser = newUser;
@@ -421,16 +424,20 @@ public class Main {
                                     String answer = addCourse.nextLine();
                                     if (answer.equalsIgnoreCase("y")) {
                                         System.out.println("Enter the reference number of the course you would like to add: \n");
+                                        boolean courseFound = false;
                                         int refNum = addCourse.nextInt();
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
                                             if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
+                                                courseFound = true;
                                                 if (currentSchedule.addCourse(f.getFilteredResults().get(i))) {
                                                     System.out.println("Course added to schedule!");
                                                 }
                                                 break;
                                             }
                                         }
-
+                                        if (!courseFound) {
+                                            System.out.println("Unable to find course in filtered result");
+                                        }
                                     } else if (answer.equalsIgnoreCase("n")) {
                                         break;
                                     } else {
