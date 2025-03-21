@@ -30,26 +30,10 @@ public class Main {
         User tempUser = new User("Temp", "a@a.com", "pw");
         data.CreateNewUser(tempUser);
 
-        // Course used for testing
-        double[][] time = {{}, {14, 14.5}, {}, {14, 14.5}, {}, {14, 14.5}, {}};
-        Course softwareEngineeringA = new Course("COMP", 350,
-                'A', "Software Engineering", 3, "description",
-                "Dr. Hutchins", 123456, Course.Days.MWF, 14.0, 14.5,
-                time);
-        double[][] time1 = {{}, {12, 12.5}, {}, {12, 12.5}, {11, 11.5}, {12, 12.5}, {}};
-        Course discrete = new Course("MATH", 214,
-                'A', "Discrete Math", 3, "description",
-                "Dr. Bancroft", 111111, Course.Days.MWF, 12.0, 12.5,
-                time1);
-        double[][] time2 = {{}, {}, {9.3, 10.45}, {}, {9.3, 10.45}, {}, {}};
-        Course OS = new Course("COMP", 340,
-                'B', "Operating Systems", 3, "description",
-                "Dr. Zhang", 222222, Course.Days.TR, 9.3, 10.45,
-                time2);
-
         Scanner scanner = new Scanner(System.in);
 
         User currentUser = null;
+        outer:
         while (true) {
 
             System.out.print("Enter 'login', 'signup', or 'quit': ");
@@ -61,10 +45,12 @@ public class Main {
                     if(failedAttempts >= 5){
                         System.out.println("Too many failed attempts, exiting");
                         break;
-
                     }
-                    System.out.print("Enter email: ");
+                    System.out.print("Enter email (or 'quit'): ");
                     String email = scanner.nextLine();
+                    if (email.equalsIgnoreCase("quit")) {
+                        continue outer;
+                    }
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
@@ -88,7 +74,7 @@ public class Main {
                 String email;
                 String password;
                 while(true) {
-                    System.out.print("Enter name: ");
+                    System.out.print("Enter your name: ");
                     name = scanner.nextLine();
                     if (Objects.equals(name, "")) {
                         System.out.println("Please enter a name");
@@ -143,15 +129,9 @@ public class Main {
                     Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, schedules.size());
                     schedules.add(mySchedule);
 
-                    mySchedule.addCourse(softwareEngineeringA);
-                    mySchedule.addCourse(discrete);
-                    mySchedule.addCourse(OS);
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
                     break;
-                } else if (schedules.isEmpty()) { // user doesn't have any schedule to open
-                    System.out.println("You don't have any existing schedules, try creating one.");
-                    continue;
                 } else if (scheduleInput.equalsIgnoreCase("show schedules")) {  // show schedules
                     if (schedules.isEmpty()) {
                         System.out.println("You don't have any schedules.");
@@ -160,8 +140,8 @@ public class Main {
                         for (Schedule schedule : schedules) {
                             System.out.println(schedule.listView());
                         }
-
                     }
+                    continue;
                 } else if (scheduleInput.equalsIgnoreCase("delete")){
                     System.out.print("Enter the ID of the schedule to delete (or 'quit'): ");
                     scheduleInput = scanner.nextLine();
@@ -292,7 +272,7 @@ public class Main {
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
-                                        System.out.println("Course removed");
+                                        System.out.println("Course " + refNum + "removed");
                                     } else {
                                         System.out.println("Course not found");
                                     }
@@ -334,19 +314,15 @@ public class Main {
 
                         //temporary search results
 
-
-//                        Search s = data.GetCoursesSearch(new Search(keywords));
-
-
-
-
+                        Search s = new Search(keywords);
+                        s = data.GetCoursesSearch(s);
 
                         while (true) {
-                            ArrayList<Course> example = new ArrayList<>();
-                            example.add(softwareEngineeringA);
-                            example.add(discrete);
-                            example.add(OS);
-                            Search s = new Search(example);
+//                            ArrayList<Course> example = new ArrayList<>();
+//                            example.add(softwareEngineeringA);
+//                            example.add(discrete);
+//                            example.add(OS);
+//                            Search s = new Search(example);
                             Filter f;
                             boolean skip = false;
                             System.out.println("Here are your search results!\n");

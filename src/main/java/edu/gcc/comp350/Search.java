@@ -7,12 +7,13 @@ public class Search {
     private ArrayList<String> keywords;
     private ArrayList<Course> searchResults;
 
-//    public Search(ArrayList<String> keywords) {
-//        this.keywords = keywords;
-//    }
-    public Search(ArrayList<Course> example){
-        searchResults = example;
+    public Search(ArrayList<String> keywords) {
+        this.keywords = keywords;
+        this.searchResults = new ArrayList<Course>();
     }
+//    public Search(ArrayList<Course> example){
+//        searchResults = example;
+//    }
     public void SetResults(ArrayList<Course> courses) {
         searchResults = courses;
     }
