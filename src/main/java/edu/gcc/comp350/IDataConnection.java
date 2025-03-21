@@ -5,6 +5,9 @@ import java.util.List;
 
 public interface IDataConnection {
 
+
+    public Course GetCourseByRef(int ref);
+
     public Search GetCoursesSearch(Search search);
 
     public Schedule SaveSchedule(Schedule schedule);

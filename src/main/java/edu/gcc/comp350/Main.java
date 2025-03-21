@@ -7,12 +7,13 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+
     public static void main(String[] args) {
         run();
     }
     public static void run() {
 
-        IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
         // structure of I/O
 
         // login or signup
@@ -331,6 +332,10 @@ public class Main {
                             System.out.println("Here are your search results!\n");
                             for (Course course : s.getSearchResults()) {
                                 System.out.println(course.toString());
+                            }
+                            if (s.getSearchResults().isEmpty()) {
+                                System.out.println("No results found");
+                                break;
                             }
 
                             System.out.println("\nFilters: Enter the filters you would like with a space in between, 'c' for credits, 'dep' for department, 'cn' for course number, 'cs' for course section, 'd' for days, 's' for start time, or 'e' for end time: ");

@@ -78,6 +78,15 @@ public class LocalDataStorage implements IDataConnection {
         return search;
     }
 
+    public Course GetCourseByRef(int referenceNumber){
+        for (Course course: courses){
+            if (course.getReferenceNumber() == referenceNumber){
+                return course;
+            }
+        }
+        return null;
+    }
+
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
         for (String keyword : keywords){
             if (!course.getTitle().toLowerCase().contains((keyword.toLowerCase()))){
