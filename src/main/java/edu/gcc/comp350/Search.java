@@ -9,6 +9,7 @@ public class Search {
 
     public Search(ArrayList<String> keywords) {
         this.keywords = keywords;
+        this.searchResults = new ArrayList<Course>();
     }
 //    public Search(ArrayList<Course> example){
 //        searchResults = example;

@@ -21,8 +21,9 @@ public class JsonConverter {
 
 
 
-
+            int refNum = 0;
             for (OriginalCourse oc: originalCourses){
+                refNum++;
                 StringBuilder build = new StringBuilder();
                 for (int i = 0; i < oc.faculty.length; i++){
                     build.append(oc.faculty[i]);
@@ -33,7 +34,7 @@ public class JsonConverter {
                 double startTime = 0;
                 double endTime = 0;
                 double[][] timeSlots = new double[7][2];
-                int slotoffset = 1;
+                int slotoffset = 0;
                 Course.Days days = Course.Days.MWF;
 
                 for (int i = 0; i<oc.times.length; i++){
@@ -72,7 +73,7 @@ public class JsonConverter {
 
 
 
-                Course nc = new Course(oc.subject, oc.number, oc.section, oc.name, oc.credits, "TBD", build.toString(), 0, days, startTime, endTime, timeSlots);
+                Course nc = new Course(oc.subject, oc.number, oc.section, oc.name, oc.credits, "TBD", build.toString(), refNum, days, startTime, endTime, timeSlots);
                 courses.add(nc);
             }
             FileWriter writer = new FileWriter("courses.json");

@@ -80,7 +80,7 @@ public class LocalDataStorage implements IDataConnection {
 
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
         for (String keyword : keywords){
-            if (!course.getDescription().contains((keyword))){
+            if (!course.getTitle().toLowerCase().contains((keyword.toLowerCase()))){
                 return false;
             }
         }
