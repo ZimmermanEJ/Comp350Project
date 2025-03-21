@@ -55,11 +55,11 @@ public class JsonConverter {
                             slotoffset = 4;
                             break;
                     }
-                    if (oc.times[i].startTime!=null) {
-                        String[] times = oc.times[i].startTime.split(":");
+                    if (oc.times[i].start_time !=null) {
+                        String[] times = oc.times[i].start_time.split(":");
                         timeSlots[slotoffset][0] = (double) Integer.parseInt(times[0]) + 0.01 * Integer.parseInt(times[1]);
 
-                        times = oc.times[i].endTime.split(":");
+                        times = oc.times[i].end_time.split(":");
                         timeSlots[slotoffset][1] = (double) Integer.parseInt(times[0]) + 0.01 * Integer.parseInt(times[1]);
 
                         if (startTime == 0) {
