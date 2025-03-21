@@ -41,7 +41,7 @@ public class Course {
     }
 
     public boolean hasConflict(Course course) {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 5; i++) {
             if(this.timeSlot[i].length > 1 && course.timeSlot[i].length > 1) {
                 if (this.timeSlot[i][0] == course.timeSlot[i][0] && this.timeSlot[i][1] == course.timeSlot[i][1]) {
                     return true;
@@ -108,6 +108,6 @@ public class Course {
     }
 
     public String toString(){
-        return department + " " + courseNumber + sectionCode + " - " + title + ": " + "Course Code " + referenceNumber;
+        return department + " " + courseNumber + sectionCode + " - " + title;
     }
 }
