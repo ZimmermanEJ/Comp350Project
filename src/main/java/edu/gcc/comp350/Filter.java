@@ -29,17 +29,17 @@ public class Filter {
     public Filter(int credits, String department, int courseNumber,
                   char sectionCode, String classdays, double startTime, double endTime,
                   Search search) {
-        this.credits = credits;
+            this.credits = credits;
             this.department = department;
             this.courseNumber = courseNumber;
             this.sectionCode = sectionCode;
             this.startTime = startTime;
             this.endTime = endTime;
             this.search = search;
-            this.filteredResults = search.getSearchResults();
+            this.filteredResults = new ArrayList<>(this.search.getSearchResults());
 
 
-        filteredResults.removeIf(course -> !helper(course, credits, department, courseNumber, sectionCode, classdays, startTime, endTime));
+        this.filteredResults.removeIf(course -> !helper(course, credits, department, courseNumber, sectionCode, classdays, startTime, endTime));
 
     }
     /**
