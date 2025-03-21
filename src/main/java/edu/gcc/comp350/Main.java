@@ -7,12 +7,13 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+
     public static void main(String[] args) {
         run();
     }
     public static void run() {
 
-        IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
         // structure of I/O
 
         // login or signup
@@ -323,9 +324,13 @@ public class Main {
                         Search s = new Search(keywords);
                         s = data.GetCoursesSearch(s);
                         System.out.println("Here are your search results!\n");
-                        for (Course course : s.getSearchResults()) {
-                            System.out.println(course.toString());
-                        }
+                            for (Course course : s.getSearchResults()) {
+                                System.out.println(course.toString());
+                            }
+                            if (s.getSearchResults().isEmpty()) {
+                                System.out.println("No results found");
+                                continue;
+                            }
 
                         while (true) {
 
