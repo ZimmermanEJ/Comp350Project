@@ -59,7 +59,9 @@ public class Main {
                         System.out.println("Invalid credentials");
                         failedAttempts++;
                     } else {
-                        schedules = data.GetUserIdSchedules(currentUser.getUserID());
+                        try {
+                            schedules = data.GetUserIdSchedules(currentUser.getUserID());
+                        }catch (Exception ignored){}
                         break;
                     }
                 }
@@ -109,7 +111,7 @@ public class Main {
               User newUser = new User(name, email, password);
               data.CreateNewUser(newUser);
               currentUser = newUser;
-              schedules = data.GetUserIdSchedules(currentUser.getUserID());
+//              schedules = data.GetUserIdSchedules(currentUser.getUserID());
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
             } else {
@@ -319,9 +321,14 @@ public class Main {
 
 
                         Search s = new Search(keywords);
+                        s = data.GetCoursesSearch(s);
+                        System.out.println("Here are your search results!\n");
+                        for (Course course : s.getSearchResults()) {
+                            System.out.println(course.toString());
+                        }
 
                         while (true) {
-                            s = data.GetCoursesSearch(s);
+
 //                            ArrayList<Course> example = new ArrayList<>();
 //                            example.add(softwareEngineeringA);
 //                            example.add(discrete);
@@ -329,13 +336,10 @@ public class Main {
 //                            Search s = new Search(example);
                             Filter f;
                             boolean skip = false;
-                            System.out.println("Here are your search results!\n");
-                            for (Course course : s.getSearchResults()) {
-                                System.out.println(course.toString());
-                            }
+
 
                             System.out.println("\nFilters: Enter the filters you would like with a space in between, 'c' for credits, 'dep' for department, 'cn' for course number, 'cs' for course section, 'd' for days, 's' for start time, or 'e' for end time: ");
-                            System.out.println("If you would not like any filters, type 'none'. If you would like to quit, type 'quit'");
+                            System.out.println("If you would not like any filters, type nothing. If you would like to quit, type 'quit'");
                             String filter = scanner.nextLine();
                             Scanner filterScanner = new Scanner(filter);
                             ArrayList<String> filters = new ArrayList<>();
@@ -413,8 +417,12 @@ public class Main {
                                     section = " ";
                                 }
                                 //Creates a filter with the provided criteria
-                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Double.parseDouble(startTime), Double.parseDouble(endTime), s);
-
+                                try {
+                                    f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Double.parseDouble(startTime), Double.parseDouble(endTime), s);
+                                }catch (Exception e){
+                                    System.out.println("Invalid input, try again");
+                                    continue;
+                                }
                                 System.out.println("Here are the filtered results!\n");
                                 for (Course course : f.getFilteredResults()) {
                                     System.out.println(course.toString());
@@ -426,7 +434,19 @@ public class Main {
                                     if (answer.equalsIgnoreCase("y")) {
                                         System.out.println("Enter the reference number of the course you would like to add: \n");
                                         boolean courseFound = false;
-                                        int refNum = addCourse.nextInt();
+                                        int refNum;
+                                        while(true){
+                                            try{
+                                                refNum = addCourse.nextInt();
+                                                addCourse.nextLine();
+                                                break;
+                                            }
+                                            catch (Exception e) {
+                                                System.out.println("Invalid input, try again\n");
+                                                addCourse.nextLine();
+                                            }
+                                        }
+
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
                                             if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
                                                 courseFound = true;
