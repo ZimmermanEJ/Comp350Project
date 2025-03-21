@@ -98,14 +98,20 @@ public class LocalDataStorage implements IDataConnection {
 
     @Override
     public Schedule SaveSchedule(Schedule schedule){
-        for (int i = 0; i<schedules.size(); i++){
-            if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
-                    && schedules.get(i).getUserID() == schedule.getUserID()){
-                schedules.set(i,schedule);
-                return schedule;
+        try {
+            for (int i = 0; i < schedules.size(); i++) {
+                if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
+                        && schedules.get(i).getUserID() == schedule.getUserID()) {
+                    schedules.set(i, schedule);
+                    return schedule;
+                }
             }
         }
-        schedules.add(schedule);
+        catch (Exception ignored){
+            this.schedules = new ArrayList<>();
+            schedules.add(schedule);
+        }
+
         return schedule;
     }
 
@@ -153,11 +159,11 @@ public class LocalDataStorage implements IDataConnection {
     @Override
     public ArrayList<Schedule> GetUserIdSchedules(int userID){
         ArrayList<Schedule> userSchedules = new ArrayList<>();
-        for (Schedule schedule: schedules){
-            if (schedule.getUserID()==userID){
-                userSchedules.add(schedule);
+            for (Schedule schedule : schedules) {
+                if (schedule.getUserID() == userID) {
+                    userSchedules.add(schedule);
+                }
             }
-        }
         return userSchedules;
     }
 
