@@ -98,15 +98,19 @@ public class LocalDataStorage implements IDataConnection {
 
     @Override
     public Schedule SaveSchedule(Schedule schedule){
-
+        boolean scheduleAdded = false;
         for (int i = 0; i < schedules.size(); i++) {
-                if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
-                        && schedules.get(i).getUserID() == schedule.getUserID()) {
-                    schedules.set(i, schedule);
-                    return schedule;
-                }
+            if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
+                    && schedules.get(i).getUserID() == schedule.getUserID()) {
+                scheduleAdded = true;
+                schedules.set(i, schedule);
+                return schedule;
+            }
         }
-        schedules.add(schedule);
+        if (!scheduleAdded){
+            this.schedules = new ArrayList<>();
+            schedules.add(schedule);
+        }
 
         return schedule;
     }
@@ -142,6 +146,17 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
+    public Schedule CreateNewSchedule(Schedule schedule){
+        if (GetUserIdSchedules(schedule.getUserID()).isEmpty()){
+            schedule.setScheduleID(0);
+            return schedule;
+        }
+        schedule.setScheduleID(GetUserIdSchedules(schedule.getUserID()).getLast().getScheduleID() + 1);
+        schedules.add(schedule);
+        return schedule;
+    }
+
+    @Override
     public Course GetCourseByName(String name){
         for (Course course: courses){
             String courseName = course.getDepartment() + " " + course.getCourseID() + course.getSectionCode();
@@ -173,14 +188,11 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    // TODO: Move logic from main into here for reuse
     @Override
     public boolean DeleteSchedule(Schedule schedule){
-        Schedule target = GetScheduleId(schedule.getScheduleID());
-        if (target != null) {
-            schedules.remove(target);
-            return true;
-        }
-        return false;
+        schedules.remove(schedule);
+        return true;
     }
 
     @Override
