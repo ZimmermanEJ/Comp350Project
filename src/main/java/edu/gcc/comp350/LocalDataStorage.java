@@ -146,6 +146,17 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     @Override
+    public Schedule CreateNewSchedule(Schedule schedule){
+        if (GetUserIdSchedules(schedule.getUserID()).isEmpty()){
+            schedule.setScheduleID(0);
+            return schedule;
+        }
+        schedule.setScheduleID(GetUserIdSchedules(schedule.getUserID()).getLast().getScheduleID() + 1);
+        schedules.add(schedule);
+        return schedule;
+    }
+
+    @Override
     public Course GetCourseByName(String name){
         for (Course course: courses){
             String courseName = course.getDepartment() + " " + course.getCourseID() + course.getSectionCode();
@@ -177,14 +188,11 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    // TODO: Move logic from main into here for reuse
     @Override
     public boolean DeleteSchedule(Schedule schedule){
-        Schedule target = GetScheduleId(schedule.getScheduleID());
-        if (target != null) {
-            schedules.remove(target);
-            return true;
-        }
-        return false;
+        schedules.remove(schedule);
+        return true;
     }
 
     @Override

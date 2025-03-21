@@ -26,8 +26,6 @@ public class Main {
             // create schedule
             // delete schedule
 
-
-        // arraylist used for storing users with fake user added for testing
         User tempUser = new User("Temp", "a@a.com", "pw");
         data.CreateNewUser(tempUser);
 
@@ -60,9 +58,7 @@ public class Main {
                         System.out.println("Invalid credentials");
                         failedAttempts++;
                     } else {
-                        try {
-                            schedules = data.GetUserIdSchedules(currentUser.getUserID());
-                        }catch (Exception ignored){}
+                        schedules = data.GetUserIdSchedules(currentUser.getUserID());
                         break;
                     }
                 }
@@ -112,7 +108,7 @@ public class Main {
               User newUser = new User(name, email, password);
               data.CreateNewUser(newUser);
               currentUser = newUser;
-//              schedules = data.GetUserIdSchedules(currentUser.getUserID());
+              schedules = data.GetUserIdSchedules(currentUser.getUserID());
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
             } else {
@@ -132,8 +128,12 @@ public class Main {
                 if (scheduleInput.equalsIgnoreCase("new")) { // create schedule
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
-                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, schedules.size());
-                    schedules.add(mySchedule);
+                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName);
+                    data.CreateNewSchedule(mySchedule);
+                    data.SaveSchedule(mySchedule);
+                    schedules = data.GetUserIdSchedules(currentUser.getUserID());
+
+
 
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
@@ -162,15 +162,13 @@ public class Main {
                         for (Schedule schedule : schedules) {
                             if (schedule.getScheduleID() == scheduleID) { // schedule exists
                                 deleted = data.DeleteSchedule(schedule);
+                                schedules.remove(schedule);
                                 System.out.println("Schedule " + schedule.getScheduleID() + " successfully deleted");
                                 break;
                             }
                         }
                         if (!deleted) { // schedule does not exist
                             System.out.println("No schedule " + scheduleInput);
-                        }
-                        else {
-                            schedules.remove(scheduleID);
                         }
                         continue;
                     } catch (NumberFormatException e) { // didn't input a number
@@ -272,13 +270,12 @@ public class Main {
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
                             } else if (next.equalsIgnoreCase("rc")){
-                                System.out.println(currentSchedule.getCourses());
                                 System.out.print("Enter the reference # of course to be removed: ");
                                 String course = scanner.nextLine();
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
-                                        System.out.println("Course " + refNum + "removed");
+                                        System.out.println("Course " + refNum + " removed");
                                     } else {
                                         System.out.println("Course not found");
                                     }

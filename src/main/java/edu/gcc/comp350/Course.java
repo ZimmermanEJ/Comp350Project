@@ -41,8 +41,10 @@ public class Course {
     }
 
     public boolean hasConflict(Course course) {
-        for (int i = 0; i < 5; i++) {
-            if(this.timeSlot[i].length > 1 && course.timeSlot[i].length > 1) {
+        for (int i = 0; i < 7; i++) {
+            if(this.timeSlot[i].length > 1 && course.timeSlot[i].length > 1
+            && (this.timeSlot[i][0] != 0 && this.timeSlot[i][1] != 0)
+            && (course.timeSlot[i][0] != 0 && course.timeSlot[i][1] != 0)) {
                 if (this.timeSlot[i][0] == course.timeSlot[i][0] && this.timeSlot[i][1] == course.timeSlot[i][1]) {
                     return true;
                 }
@@ -108,6 +110,6 @@ public class Course {
     }
 
     public String toString(){
-        return department + " " + courseNumber + sectionCode + " - " + title + " " + String.format("%.2f", ((startTime-1) % 12) + 1) + " - " + String.format("%.2f", ((endTime-1) % 12) + 1) + days + " #" + referenceNumber;
+        return department + " " + courseNumber + sectionCode + " - " + title + " " + String.format("%.2f", ((startTime-1) % 12) + 1) + " - " + String.format("%.2f", ((endTime-1) % 12) + 1) + " " + days + " #" + referenceNumber;
     }
 }
