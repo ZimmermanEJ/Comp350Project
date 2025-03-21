@@ -11,9 +11,8 @@ public class Schedule {
     private ArrayList<Integer> courses;
     private ArrayList<Integer> events;
 
-    public Schedule(int userID, String name, int scheduleID) {
+    public Schedule(int userID, String name) {
         this.userID = userID;
-        this.scheduleID = scheduleID;
         this.name = name;
         this.courses = new ArrayList<>();
         this.events = new ArrayList<>();
@@ -66,6 +65,10 @@ public class Schedule {
             }
         }
         return null;
+    }
+
+    public void setScheduleID(int scheduleID) {
+        this.scheduleID = scheduleID;
     }
 
     public int getTotalCredits() {
