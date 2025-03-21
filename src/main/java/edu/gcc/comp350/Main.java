@@ -454,8 +454,11 @@ public class Main {
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
                                             if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
                                                 courseFound = true;
-                                                if (currentSchedule.addCourse(f.getFilteredResults().get(i))) {
+                                                String conflict = currentSchedule.addCourse(f.getFilteredResults().get(i));
+                                                if (conflict == null) {
                                                     System.out.println("Course added to schedule!");
+                                                } else {
+                                                    System.out.println("Course has a time conflict with course " + conflict);
                                                 }
                                                 break;
                                             }

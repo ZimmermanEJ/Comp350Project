@@ -19,17 +19,17 @@ public class Schedule {
         this.events = new ArrayList<>();
     }
 
-    public boolean addCourse(Course course) {
-        if(hasConflict(course)) {
-            return false;
+    public String addCourse(Course course) {
+        if(hasConflict(course) != null) {
+            return hasConflict(course);
         }else {
             courses.add(course.getReferenceNumber());
-            return true;
+            return null;
         }
     }
 
     public boolean removeCourse(int refNum) {
-        for (Integer c: courses) {
+        for (int c: courses) {
             if (c == refNum) {
                 courses.remove(c);
                 return true;
@@ -56,17 +56,16 @@ public class Schedule {
      * Checks if the given course has a time conflict with any existing courses in the schedule.
      *
      * @param course the course to check for conflicts
-     * @return true if there is a conflict, false otherwise
+     * @return name of conflict if there is a conflict, null otherwise
      */
-    public boolean hasConflict(Course course) {
+    public String hasConflict(Course course) {
         for (Integer courseRef : this.getCourses()) {
             Course c = Main.data.GetCourseByRef(courseRef);
             if (c.hasConflict(course)) {
-                System.out.println("Course " + course.getTitle() + " has a time conflict with course " + c.getTitle());
-                return true;
+                return c.getTitle();
             }
         }
-        return false;
+        return null;
     }
 
     public int getTotalCredits() {
