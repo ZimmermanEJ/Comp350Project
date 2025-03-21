@@ -23,7 +23,7 @@ public class Schedule {
         if(hasConflict(course)) {
             return false;
         }else {
-            courses.put(course, "Red");
+            courses.put(course, "");
             return true;
         }
     }

@@ -427,7 +427,7 @@ public class Main {
                                     section = " ";
                                 }
                                 //Creates a filter with the provided criteria
-                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Integer.parseInt(startTime), Integer.parseInt(endTime), s);
+                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Double.parseDouble(startTime), Double.parseDouble(endTime), s);
 
                                 System.out.println("Here are the filtered results!\n");
                                 for (Course course : f.getFilteredResults()) {
@@ -448,6 +448,7 @@ public class Main {
                                                     System.out.println("Course added to schedule!");
                                                     break;
                                                 }
+                                                break;
                                             }
                                         }
 
