@@ -197,7 +197,7 @@ public class LocalDataStorage implements IDataConnection {
             schedule.setScheduleID(0);
             return schedule;
         }
-        schedule.setScheduleID(GetUserIdSchedules(schedule.getUserID()).getLast().getScheduleID() + 1);
+        schedule.setScheduleID(GetUserIdSchedules(schedule.getUserID()).get(GetUserIdSchedules(schedule.getUserID()).size() - 1).getScheduleID() + 1);
         schedules.add(schedule);
         return schedule;
     }
@@ -240,8 +240,9 @@ public class LocalDataStorage implements IDataConnection {
      * @return The schedule with the given ID, or null if not found.
      */
     @Override
-    public Schedule GetScheduleId(int scheduleID){
-        for (Schedule schedule: schedules){
+    public Schedule GetScheduleId(int userID, int scheduleID){
+        ArrayList<Schedule> userSchedules = GetUserIdSchedules(userID);
+        for (Schedule schedule: userSchedules){
             if (schedule.getScheduleID()==scheduleID){
                 return schedule;
             }
