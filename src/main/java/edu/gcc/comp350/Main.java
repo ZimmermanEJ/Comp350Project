@@ -7,12 +7,13 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+
     public static void main(String[] args) {
         run();
     }
     public static void run() {
 
-        IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
         // structure of I/O
 
         // login or signup
@@ -25,8 +26,6 @@ public class Main {
             // create schedule
             // delete schedule
 
-
-        // arraylist used for storing users with fake user added for testing
         User tempUser = new User("Temp", "a@a.com", "pw");
         data.CreateNewUser(tempUser);
 
@@ -129,8 +128,12 @@ public class Main {
                 if (scheduleInput.equalsIgnoreCase("new")) { // create schedule
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
-                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, schedules.size());
-                    schedules.add(mySchedule);
+                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName);
+                    data.CreateNewSchedule(mySchedule);
+                    data.SaveSchedule(mySchedule);
+                    schedules = data.GetUserIdSchedules(currentUser.getUserID());
+
+
 
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
@@ -159,15 +162,13 @@ public class Main {
                         for (Schedule schedule : schedules) {
                             if (schedule.getScheduleID() == scheduleID) { // schedule exists
                                 deleted = data.DeleteSchedule(schedule);
+                                schedules.remove(schedule);
                                 System.out.println("Schedule " + schedule.getScheduleID() + " successfully deleted");
                                 break;
                             }
                         }
                         if (!deleted) { // schedule does not exist
                             System.out.println("No schedule " + scheduleInput);
-                        }
-                        else {
-                            schedules.remove(scheduleID);
                         }
                         continue;
                     } catch (NumberFormatException e) { // didn't input a number
@@ -269,13 +270,12 @@ public class Main {
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
                             } else if (next.equalsIgnoreCase("rc")){
-                                System.out.println(currentSchedule.getCourses());
                                 System.out.print("Enter the reference # of course to be removed: ");
                                 String course = scanner.nextLine();
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
-                                        System.out.println("Course " + refNum + "removed");
+                                        System.out.println("Course " + refNum + " removed");
                                     } else {
                                         System.out.println("Course not found");
                                     }
@@ -317,10 +317,20 @@ public class Main {
 
                         //temporary search results
 
+
                         Search s = new Search(keywords);
                         s = data.GetCoursesSearch(s);
+                        System.out.println("Here are your search results!\n");
+                            for (Course course : s.getSearchResults()) {
+                                System.out.println(course.toString());
+                            }
+                            if (s.getSearchResults().isEmpty()) {
+                                System.out.println("No results found");
+                                continue;
+                            }
 
                         while (true) {
+
 //                            ArrayList<Course> example = new ArrayList<>();
 //                            example.add(softwareEngineeringA);
 //                            example.add(discrete);
@@ -328,13 +338,10 @@ public class Main {
 //                            Search s = new Search(example);
                             Filter f;
                             boolean skip = false;
-                            System.out.println("Here are your search results!\n");
-                            for (Course course : s.getSearchResults()) {
-                                System.out.println(course.toString());
-                            }
+
 
                             System.out.println("\nFilters: Enter the filters you would like with a space in between, 'c' for credits, 'dep' for department, 'cn' for course number, 'cs' for course section, 'd' for days, 's' for start time, or 'e' for end time: ");
-                            System.out.println("If you would not like any filters, type 'none'. If you would like to quit, type 'quit'");
+                            System.out.println("If you would not like any filters, type nothing. If you would like to quit, type 'quit'");
                             String filter = scanner.nextLine();
                             Scanner filterScanner = new Scanner(filter);
                             ArrayList<String> filters = new ArrayList<>();
@@ -412,8 +419,12 @@ public class Main {
                                     section = " ";
                                 }
                                 //Creates a filter with the provided criteria
-                                f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Integer.parseInt(startTime), Integer.parseInt(endTime), s);
-
+                                try {
+                                    f = new Filter(Integer.parseInt(credits), department.toUpperCase(), Integer.parseInt(courseNumber), section.charAt(0), days, Double.parseDouble(startTime), Double.parseDouble(endTime), s);
+                                }catch (Exception e){
+                                    System.out.println("Invalid input, try again");
+                                    continue;
+                                }
                                 System.out.println("Here are the filtered results!\n");
                                 for (Course course : f.getFilteredResults()) {
                                     System.out.println(course.toString());
@@ -425,12 +436,27 @@ public class Main {
                                     if (answer.equalsIgnoreCase("y")) {
                                         System.out.println("Enter the reference number of the course you would like to add: \n");
                                         boolean courseFound = false;
-                                        int refNum = addCourse.nextInt();
+                                        int refNum;
+                                        while(true){
+                                            try{
+                                                refNum = addCourse.nextInt();
+                                                addCourse.nextLine();
+                                                break;
+                                            }
+                                            catch (Exception e) {
+                                                System.out.println("Invalid input, try again\n");
+                                                addCourse.nextLine();
+                                            }
+                                        }
+
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
                                             if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
                                                 courseFound = true;
-                                                if (currentSchedule.addCourse(f.getFilteredResults().get(i))) {
+                                                String conflict = currentSchedule.addCourse(f.getFilteredResults().get(i));
+                                                if (conflict == null) {
                                                     System.out.println("Course added to schedule!");
+                                                } else {
+                                                    System.out.println("Course has a time conflict with course " + conflict);
                                                 }
                                                 break;
                                             }

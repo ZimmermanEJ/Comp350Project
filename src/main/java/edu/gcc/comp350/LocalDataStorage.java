@@ -16,7 +16,12 @@ public class LocalDataStorage implements IDataConnection {
     File schedulesFile;
     File courseFile;
 
-
+    /**
+     * Constructor to initialize LocalDataStorage with file paths.
+     * @param coursePath Path to the courses file.
+     * @param usersPath Path to the users file.
+     * @param schedulesPath Path to the schedules file.
+     */
     public LocalDataStorage(String coursePath, String usersPath, String schedulesPath){
         usersFile = new File(usersPath);
         schedulesFile = new File(schedulesPath);
@@ -66,6 +71,11 @@ public class LocalDataStorage implements IDataConnection {
         }
     }
 
+    /**
+     * Searches for courses that match the given search criteria.
+     * @param search The search criteria.
+     * @return The search results.
+     */
     @Override
     public Search GetCoursesSearch(Search search){
         ArrayList<Course> retCourses = new ArrayList<>();
@@ -78,6 +88,26 @@ public class LocalDataStorage implements IDataConnection {
         return search;
     }
 
+    /**
+     * Retrieves a course by its reference number.
+     * @param referenceNumber The reference number of the course.
+     * @return The course with the given reference number, or null if not found.
+     */
+    public Course GetCourseByRef(int referenceNumber){
+        for (Course course: courses){
+            if (course.getReferenceNumber() == referenceNumber){
+                return course;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if a course contains all the given keywords.
+     * @param course The course to check.
+     * @param keywords The keywords to search for.
+     * @return True if the course contains all the keywords, false otherwise.
+     */
     private boolean CourseContainsKeywords(Course course, ArrayList<String> keywords){
         for (String keyword : keywords){
             if (!course.getTitle().toLowerCase().contains((keyword.toLowerCase()))){
@@ -87,19 +117,35 @@ public class LocalDataStorage implements IDataConnection {
         return true;
     }
 
+    /**
+     * Saves a schedule.
+     * @param schedule The schedule to save.
+     * @return The saved schedule.
+     */
     @Override
     public Schedule SaveSchedule(Schedule schedule){
-        for (int i = 0; i<schedules.size(); i++){
+        boolean scheduleAdded = false;
+        for (int i = 0; i < schedules.size(); i++) {
             if (schedules.get(i).getScheduleID() == schedule.getScheduleID()
-                    && schedules.get(i).getUserID() == schedule.getUserID()){
-                schedules.set(i,schedule);
+                    && schedules.get(i).getUserID() == schedule.getUserID()) {
+                scheduleAdded = true;
+                schedules.set(i, schedule);
                 return schedule;
             }
         }
-        schedules.add(schedule);
+        if (!scheduleAdded){
+            this.schedules = new ArrayList<>();
+            schedules.add(schedule);
+        }
+
         return schedule;
     }
 
+    /**
+     * Retrieves a user by their name.
+     * @param name The name of the user.
+     * @return The user with the given name, or null if not found.
+     */
     @Override
     public User GetUserByName(String name){
         for (User user: users){
@@ -110,6 +156,11 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    /**
+     * Retrieves a user by their email.
+     * @param email The email of the user.
+     * @return The user with the given email, or null if not found.
+     */
     @Override
     public User GetUserByEmail(String email){
         for (User user: users){
@@ -120,6 +171,11 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    /**
+     * Creates a new user.
+     * @param user The user to create.
+     * @return The created user, or null if a user with the same email already exists.
+     */
     @Override
     public User CreateNewUser(User user){
         if (GetUserByEmail(user.getEmail())==null){
@@ -130,6 +186,27 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    /**
+     * Creates a new schedule.
+     * @param schedule The schedule to create.
+     * @return The created schedule.
+     */
+    @Override
+    public Schedule CreateNewSchedule(Schedule schedule){
+        if (GetUserIdSchedules(schedule.getUserID()).isEmpty()){
+            schedule.setScheduleID(0);
+            return schedule;
+        }
+        schedule.setScheduleID(GetUserIdSchedules(schedule.getUserID()).get(GetUserIdSchedules(schedule.getUserID()).size() - 1).getScheduleID() + 1);
+        schedules.add(schedule);
+        return schedule;
+    }
+
+    /**
+     * Retrieves a course by its name.
+     * @param name The name of the course.
+     * @return The course with the given name, or null if not found.
+     */
     @Override
     public Course GetCourseByName(String name){
         for (Course course: courses){
@@ -141,20 +218,31 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    /**
+     * Retrieves all schedules for a given user ID.
+     * @param userID The user ID.
+     * @return A list of schedules for the user.
+     */
     @Override
     public ArrayList<Schedule> GetUserIdSchedules(int userID){
         ArrayList<Schedule> userSchedules = new ArrayList<>();
-        for (Schedule schedule: schedules){
-            if (schedule.getUserID()==userID){
+        for (Schedule schedule : schedules) {
+            if (schedule.getUserID() == userID) {
                 userSchedules.add(schedule);
             }
         }
         return userSchedules;
     }
 
+    /**
+     * Retrieves a schedule by its ID.
+     * @param scheduleID The schedule ID.
+     * @return The schedule with the given ID, or null if not found.
+     */
     @Override
-    public Schedule GetScheduleId(int scheduleID){
-        for (Schedule schedule: schedules){
+    public Schedule GetScheduleId(int userID, int scheduleID){
+        ArrayList<Schedule> userSchedules = GetUserIdSchedules(userID);
+        for (Schedule schedule: userSchedules){
             if (schedule.getScheduleID()==scheduleID){
                 return schedule;
             }
@@ -162,16 +250,20 @@ public class LocalDataStorage implements IDataConnection {
         return null;
     }
 
+    /**
+     * Deletes a schedule.
+     * @param schedule The schedule to delete.
+     * @return True if the schedule was deleted, false otherwise.
+     */
     @Override
     public boolean DeleteSchedule(Schedule schedule){
-        Schedule target = GetScheduleId(schedule.getScheduleID());
-        if (target != null) {
-            schedules.remove(target);
-            return true;
-        }
-        return false;
+        schedules.remove(schedule);
+        return true;
     }
 
+    /**
+     * Closes the connection and saves the data to the files.
+     */
     @Override
     public void CloseConnection(){
         Gson gson = new GsonBuilder().create();
