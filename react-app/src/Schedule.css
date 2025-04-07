@@ -1,0 +1,37 @@
+/* Schedule.css */
+.ScheduleComponent {
+  padding-top: 60px; /* Adjust this value as needed */
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  z-index: 1000; /* Ensure the nav bar is above other content */
+}
+
+.nav-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-around;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-item {
+  padding: 10px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  flex: 1;
+  text-align: center;
+  padding: 10px 100px;
+}
+
+.nav-item a.active {
+  font-weight: bold;
+  background-color: #0056b3;
+}

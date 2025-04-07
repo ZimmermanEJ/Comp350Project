@@ -24,7 +24,7 @@ public interface IDataConnection {
 
     public ArrayList<Schedule> GetUserIdSchedules(int userID);
 
-    public Schedule GetScheduleId(int scheduleID);
+    public Schedule GetScheduleId(int userID, int scheduleID);
 
     public boolean DeleteSchedule(Schedule schedule);
 

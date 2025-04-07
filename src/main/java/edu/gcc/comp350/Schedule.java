@@ -30,7 +30,7 @@ public class Schedule {
     public boolean removeCourse(int refNum) {
         for (int c: courses) {
             if (c == refNum) {
-                courses.remove(c);
+                courses.remove(Integer.valueOf(c));
                 return true;
             }
         }
