@@ -1,4 +1,6 @@
 package edu.gcc.comp350;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,9 +59,9 @@ public class Schedule {
      * @param course the course to check for conflicts
      * @return name of conflict if there is a conflict, null otherwise
      */
-    public String hasConflict(Course course) {
-        for (Integer courseRef : this.getCourses()) {
-            Course c = Main.data.GetCourseByRef(courseRef);
+   public String hasConflict(Course course) {
+       for (Integer courseRef : this.getCourses()) {
+           Course c = Main.data.GetCourseByRef(courseRef);
             if (c.hasConflict(course)) {
                 return c.getTitle();
             }
@@ -185,5 +187,48 @@ public class Schedule {
         toReturn.append(" - ").append(this.getTotalCredits()).append(" credits");
 
         return toReturn.toString();
+    }
+
+    public void exportSchedule(String filename) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(filename + ".ics");
+        pw.println("BEGIN:VCALENDAR");
+        pw.println("VERSION:2.0");
+        pw.println("PRODID:-//Grove City College//" + name + "//EN");
+
+        for (Integer courseRef : this.getCourses()) {
+            Course course = Main.data.GetCourseByRef(courseRef);
+            double[][] timeslot = course.getTimeSlot();
+            for (int i = 1; i < 6; i++) { // Monday to Friday
+                double[] day = timeslot[i];
+                if (day[1] - day[0] > 0) {
+                    pw.println("BEGIN:VEVENT");
+                    pw.println("SUMMARY:" + course.getTitle());
+                    pw.println("DTSTART;TZID=America/New_York:" + formatTime(i, day[0]));
+                    pw.println("DTEND;TZID=America/New_York:" + formatTime(i, day[1]));
+                    pw.println("RRULE:FREQ=WEEKLY;WKST=SU;UNTIL=20251210T035959Z");
+                    pw.println("UID:" + course.getReferenceNumber() + i + "@gcc.edu");
+                    pw.println("END:VEVENT");
+                }
+            }
+        }
+        pw.println("END:VCALENDAR");
+        pw.close();
+    }
+
+    private String formatTime(int dayOfWeek, double time) {
+        int hour = (int) time;
+        int minute = (int) ((time - hour) * 100);
+        return String.format("2025080%dT%02d%02d00", dayOfWeek + 24, hour, minute);
+    }
+
+    private String getDayOfWeek(int day) {
+        switch (day) {
+            case 1: return "MO";
+            case 2: return "TU";
+            case 3: return "WE";
+            case 4: return "TH";
+            case 5: return "FR";
+            default: return "";
+        }
     }
 }

@@ -201,7 +201,7 @@ public class Main {
                 while (true) {
                     System.out.println("\nCurrently viewing " + currentSchedule.getName());
 
-                    System.out.print("Enter 'view' to view schedule, 'search' to search, or 'quit': ");
+                    System.out.print("Enter 'view' to view schedule, 'search' to search, 'export' to export calendar, or 'quit': ");
                     String nextAction = scanner.nextLine();
 
                     if (nextAction.equalsIgnoreCase("quit")) {
@@ -473,7 +473,14 @@ public class Main {
                             }
 //
                         }
-
+                    } else if (nextAction.equalsIgnoreCase("export")) {
+                        System.out.println("Enter a file name for file to be stored under:");
+                        String filename = scanner.nextLine();
+                        try {
+                            currentSchedule.exportSchedule(filename);
+                        } catch (Exception e) {
+                            System.out.println("Error exporting schedule: " + e.getMessage());
+                        }
                     } else { // invalid input
                         System.out.println("Input not valid, try again\n");
                     }
