@@ -1,4 +1,6 @@
 package edu.gcc.comp350;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,31 +10,29 @@ public class Schedule {
     private int userID;
     private int scheduleID;
     private String name;
-    private Map<Course, String> courses; // course to color
-    private Map<Event, String> events; // event to color
+    private ArrayList<Integer> courses;
+    private ArrayList<Integer> events;
 
-    public Schedule(int userID, String name, int scheduleID) {
+    public Schedule(int userID, String name) {
         this.userID = userID;
-        this.scheduleID = scheduleID;
         this.name = name;
-        this.courses = new HashMap<Course, String>();
-        this.events = new HashMap<Event, String>();
+        this.courses = new ArrayList<>();
+        this.events = new ArrayList<>();
     }
 
-    public boolean addCourse(Course course) {
-        if(hasConflict(course)) {
-            return false;
+    public String addCourse(Course course) {
+        if(hasConflict(course) != null) {
+            return hasConflict(course);
         }else {
-            courses.put(course, "");
-            return true;
+            courses.add(course.getReferenceNumber());
+            return null;
         }
     }
 
     public boolean removeCourse(int refNum) {
-        System.out.println(courses.size());
-        for (Course c: courses.keySet()) {
-            if (c.getReferenceNumber() == refNum) {
-                courses.remove(c);
+        for (int c: courses) {
+            if (c == refNum) {
+                courses.remove(Integer.valueOf(c));
                 return true;
             }
         }
@@ -40,12 +40,12 @@ public class Schedule {
     }
 
     public void addEvent(Event event) {
-        events.put(event, "Blue");
+        events.add(event.getEventID());
     }
 
     public boolean removeEvent(int eventID) {
-        for (Event e: events.keySet()) {
-            if (e.getEventID() == eventID) {
+        for (int e: events) {
+            if (e == eventID) {
                 events.remove(e);
                 return true;
             }
@@ -57,21 +57,26 @@ public class Schedule {
      * Checks if the given course has a time conflict with any existing courses in the schedule.
      *
      * @param course the course to check for conflicts
-     * @return true if there is a conflict, false otherwise
+     * @return name of conflict if there is a conflict, null otherwise
      */
-    public boolean hasConflict(Course course) {
-        for (Course c : this.getCourses().keySet()) {
+   public String hasConflict(Course course) {
+       for (Integer courseRef : this.getCourses()) {
+           Course c = Main.data.GetCourseByRef(courseRef);
             if (c.hasConflict(course)) {
-                System.out.println("Course " + course.getTitle() + " has a time conflict with course " + c.getTitle());
-                return true;
+                return c.getTitle();
             }
         }
-        return false;
+        return null;
+    }
+
+    public void setScheduleID(int scheduleID) {
+        this.scheduleID = scheduleID;
     }
 
     public int getTotalCredits() {
         int total = 0;
-        for (Course course : this.getCourses().keySet()){
+        for (Integer courseRef : this.getCourses()){
+            Course course = Main.data.GetCourseByRef(courseRef);
             total += course.getCredits();
         }
         return total;
@@ -93,11 +98,11 @@ public class Schedule {
         this.name = name;
     }
 
-    public Map<Course, String> getCourses() {
+    public ArrayList<Integer> getCourses() {
         return courses;
     }
 
-    public Map<Event, String> getEvents() {
+    public ArrayList<Integer> getEvents() {
         return events;
     }
 
@@ -139,7 +144,8 @@ public class Schedule {
             toReturn.append(String.format("%-5s", ((hour-1) % 12) + 1 + (hour <= 11 ? "AM" :"PM"))).append("|\t");
             for (int i = 1; i < 6; i++) { // monday through friday
                 boolean courseAdded = false;
-                for (Course course : this.getCourses().keySet()) {
+                for (Integer courseRef : this.getCourses()) {
+                    Course course = Main.data.GetCourseByRef(courseRef);
                     double[][] timeslot = course.getTimeSlot();
                     double[] day = timeslot[i];
                     if (day.length == 2 && hour >= day[0] && hour < day[1]) {
@@ -161,8 +167,9 @@ public class Schedule {
         // Print out the events at the bottom
         if (!this.getEvents().isEmpty()) {
             toReturn.append("Events:\n");
-            for (Event event : this.getEvents().keySet()) {
-                toReturn.append(event.toString()).append("\n");
+            for (Integer eventID : this.getEvents()) {
+                // Event event = LocalDataStorage.GetEventByID(eventID);
+                // toReturn.append(event.toString()).append("\n");
             }
         } else {
             toReturn.append("No events scheduled\n");
@@ -180,5 +187,48 @@ public class Schedule {
         toReturn.append(" - ").append(this.getTotalCredits()).append(" credits");
 
         return toReturn.toString();
+    }
+
+    public void exportSchedule(String filename) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(filename + ".ics");
+        pw.println("BEGIN:VCALENDAR");
+        pw.println("VERSION:2.0");
+        pw.println("PRODID:-//Grove City College//" + name + "//EN");
+
+        for (Integer courseRef : this.getCourses()) {
+            Course course = Main.data.GetCourseByRef(courseRef);
+            double[][] timeslot = course.getTimeSlot();
+            for (int i = 1; i < 6; i++) { // Monday to Friday
+                double[] day = timeslot[i];
+                if (day[1] - day[0] > 0) {
+                    pw.println("BEGIN:VEVENT");
+                    pw.println("SUMMARY:" + course.getTitle());
+                    pw.println("DTSTART;TZID=America/New_York:" + formatTime(i, day[0]));
+                    pw.println("DTEND;TZID=America/New_York:" + formatTime(i, day[1]));
+                    pw.println("RRULE:FREQ=WEEKLY;WKST=SU;UNTIL=20251210T035959Z");
+                    pw.println("UID:" + course.getReferenceNumber() + i + "@gcc.edu");
+                    pw.println("END:VEVENT");
+                }
+            }
+        }
+        pw.println("END:VCALENDAR");
+        pw.close();
+    }
+
+    private String formatTime(int dayOfWeek, double time) {
+        int hour = (int) time;
+        int minute = (int) ((time - hour) * 100);
+        return String.format("2025080%dT%02d%02d00", dayOfWeek + 24, hour, minute);
+    }
+
+    private String getDayOfWeek(int day) {
+        switch (day) {
+            case 1: return "MO";
+            case 2: return "TU";
+            case 3: return "WE";
+            case 4: return "TH";
+            case 5: return "FR";
+            default: return "";
+        }
     }
 }

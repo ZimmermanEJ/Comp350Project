@@ -7,12 +7,13 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+
     public static void main(String[] args) {
         run();
     }
     public static void run() {
 
-        IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
         // structure of I/O
 
         // login or signup
@@ -25,8 +26,6 @@ public class Main {
             // create schedule
             // delete schedule
 
-
-        // arraylist used for storing users with fake user added for testing
         User tempUser = new User("Temp", "a@a.com", "pw");
         data.CreateNewUser(tempUser);
 
@@ -59,9 +58,7 @@ public class Main {
                         System.out.println("Invalid credentials");
                         failedAttempts++;
                     } else {
-                        try {
-                            schedules = data.GetUserIdSchedules(currentUser.getUserID());
-                        }catch (Exception ignored){}
+                        schedules = data.GetUserIdSchedules(currentUser.getUserID());
                         break;
                     }
                 }
@@ -111,7 +108,7 @@ public class Main {
               User newUser = new User(name, email, password);
               data.CreateNewUser(newUser);
               currentUser = newUser;
-//              schedules = data.GetUserIdSchedules(currentUser.getUserID());
+              schedules = data.GetUserIdSchedules(currentUser.getUserID());
             } else if (nextInput.equalsIgnoreCase("quit")) {
                 break;
             } else {
@@ -131,8 +128,12 @@ public class Main {
                 if (scheduleInput.equalsIgnoreCase("new")) { // create schedule
                     System.out.print("Enter a name for the schedule: ");
                     String scheduleName = scanner.nextLine();
-                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName, schedules.size());
-                    schedules.add(mySchedule);
+                    Schedule mySchedule = new Schedule(currentUser.getUserID(), scheduleName);
+                    data.CreateNewSchedule(mySchedule);
+                    data.SaveSchedule(mySchedule);
+                    schedules = data.GetUserIdSchedules(currentUser.getUserID());
+
+
 
                     currentSchedule = mySchedule;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
@@ -161,15 +162,13 @@ public class Main {
                         for (Schedule schedule : schedules) {
                             if (schedule.getScheduleID() == scheduleID) { // schedule exists
                                 deleted = data.DeleteSchedule(schedule);
+                                schedules.remove(schedule);
                                 System.out.println("Schedule " + schedule.getScheduleID() + " successfully deleted");
                                 break;
                             }
                         }
                         if (!deleted) { // schedule does not exist
                             System.out.println("No schedule " + scheduleInput);
-                        }
-                        else {
-                            schedules.remove(scheduleID);
                         }
                         continue;
                     } catch (NumberFormatException e) { // didn't input a number
@@ -202,7 +201,7 @@ public class Main {
                 while (true) {
                     System.out.println("\nCurrently viewing " + currentSchedule.getName());
 
-                    System.out.print("Enter 'view' to view schedule, 'search' to search, or 'quit': ");
+                    System.out.print("Enter 'view' to view schedule, 'search' to search, 'export' to export calendar, or 'quit': ");
                     String nextAction = scanner.nextLine();
 
                     if (nextAction.equalsIgnoreCase("quit")) {
@@ -271,13 +270,12 @@ public class Main {
                                 currentSchedule.addEvent(e);
                                 System.out.println("Successfully added " + e.getName());
                             } else if (next.equalsIgnoreCase("rc")){
-                                System.out.println(currentSchedule.getCourses());
                                 System.out.print("Enter the reference # of course to be removed: ");
                                 String course = scanner.nextLine();
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
-                                        System.out.println("Course " + refNum + "removed");
+                                        System.out.println("Course " + refNum + " removed");
                                     } else {
                                         System.out.println("Course not found");
                                     }
@@ -323,9 +321,13 @@ public class Main {
                         Search s = new Search(keywords);
                         s = data.GetCoursesSearch(s);
                         System.out.println("Here are your search results!\n");
-                        for (Course course : s.getSearchResults()) {
-                            System.out.println(course.toString());
-                        }
+                            for (Course course : s.getSearchResults()) {
+                                System.out.println(course.toString());
+                            }
+                            if (s.getSearchResults().isEmpty()) {
+                                System.out.println("No results found");
+                                continue;
+                            }
 
                         while (true) {
 
@@ -450,8 +452,11 @@ public class Main {
                                         for (int i = 0; i < f.getFilteredResults().size(); i++) {
                                             if (f.getFilteredResults().get(i).getReferenceNumber() == refNum) {
                                                 courseFound = true;
-                                                if (currentSchedule.addCourse(f.getFilteredResults().get(i))) {
+                                                String conflict = currentSchedule.addCourse(f.getFilteredResults().get(i));
+                                                if (conflict == null) {
                                                     System.out.println("Course added to schedule!");
+                                                } else {
+                                                    System.out.println("Course has a time conflict with course " + conflict);
                                                 }
                                                 break;
                                             }
@@ -468,7 +473,14 @@ public class Main {
                             }
 //
                         }
-
+                    } else if (nextAction.equalsIgnoreCase("export")) {
+                        System.out.println("Enter a file name for file to be stored under:");
+                        String filename = scanner.nextLine();
+                        try {
+                            currentSchedule.exportSchedule(filename);
+                        } catch (Exception e) {
+                            System.out.println("Error exporting schedule: " + e.getMessage());
+                        }
                     } else { // invalid input
                         System.out.println("Input not valid, try again\n");
                     }
