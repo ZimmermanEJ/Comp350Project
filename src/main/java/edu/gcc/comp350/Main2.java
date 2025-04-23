@@ -2,6 +2,8 @@ package edu.gcc.comp350;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
+
 import com.google.gson.Gson;
 
 import static spark.Spark.*;
@@ -47,8 +49,7 @@ public class Main2 {
             } else if (!Arrays.equals(currentUser.getPasswordHash(), currentUser.hash(password))) {
                 res.status(401);
                 return "{\"status\": \"error\", \"message\": \"Invalid password\"}";
-            }
-            else {
+            } else {
                 schedules = data.GetUserIdSchedules(currentUser.getUserID());
                 String userJson = gson.toJson(currentUser);
                 String schedulesJson = gson.toJson(schedules);
@@ -187,6 +188,65 @@ public class Main2 {
             String userJson = gson.toJson(currentUser);
             String schedulesJson = gson.toJson(schedules);
             return "{\"status\": \"success\", \"message\": \"Login successful\", \"user\": " + userJson + ", \"schedules\": " + schedulesJson + "}";
+        });
+
+
+        //create search route
+        get("/api/search", (req, res) -> {
+            res.type("application/json");
+            String searchString = req.queryParams("searchString");
+            Scanner scan = new Scanner(searchString);
+            ArrayList<String> keywords = new ArrayList<>();
+            while (scan.hasNext()) {
+                String word = scan.next();
+                keywords.add(word);
+            }
+            Search s = new Search(keywords);
+            s = data.GetCoursesSearch(s);
+            String coursesJson = gson.toJson(s.getSearchResults());
+            return "{\"status\": \"success\", \"message\": \"Courses retrieved\", \"courses\": " + coursesJson + "}";
+        });
+
+
+        // add course route
+        post("/api/addToSchedule", (req, res) -> {
+            res.type("application/json");
+            try {
+                int userID = Integer.parseInt(req.queryParams("userID"));
+                int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+                int referenceNumber = Integer.parseInt(req.queryParams("referenceNumber"));
+
+                if (currentUser == null || currentUser.getUserID() != userID) {
+                    res.status(401);
+                    return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+                }
+
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+
+                Course course = data.GetCourseByRef(referenceNumber);
+                if (course == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Course not found\"}";
+                }
+
+                String conflict = schedule.addCourse(course);
+                if (conflict == null) {
+                    return "{\"status\": \"success\", \"message\": \"Course added\"}";
+                }
+                return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                res.status(400);
+                return "{\"status\": \"error\", \"message\": \"Invalid input format\"}";
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500);
+                return "{\"status\": \"error\", \"message\": \"Internal server error\"}";
+            }
         });
     }
 }
