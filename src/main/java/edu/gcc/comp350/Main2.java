@@ -34,6 +34,18 @@ public class Main2 {
             res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
         });
 
+        // get user route
+        get("/api/user", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            if (currentUser.getUserID() == userID) {
+                String userJson = gson.toJson(currentUser);
+                return "{\"status\": \"success\", \"message\": \"User retrieved\", \"user\": " + userJson + "}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
         // Login route
         post("/api/login", (req, res) -> {
             res.type("application/json");
@@ -106,6 +118,7 @@ public class Main2 {
                 Schedule schedule = new Schedule(userID, name);
                 schedule = data.CreateNewSchedule(schedule);
                 String scheduleJson = gson.toJson(schedule);
+                data.CloseConnection();
 
                 res.status(200);
                 return "{\"status\": \"success\", \"message\": \"Schedule created\", \"schedule\": " + scheduleJson + "}";
@@ -128,6 +141,7 @@ public class Main2 {
                 }
                 boolean del = data.DeleteSchedule(schedule);
                 if (del) {
+                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Schedule deleted\"}";
                 }
                 res.status(404);
@@ -183,10 +197,54 @@ public class Main2 {
 
             User newUser = new User(name, email, password);
             data.CreateNewUser(newUser);
+            data.CloseConnection();
             currentUser = newUser;
             String userJson = gson.toJson(currentUser);
             String schedulesJson = gson.toJson(schedules);
             return "{\"status\": \"success\", \"message\": \"Login successful\", \"user\": " + userJson + ", \"schedules\": " + schedulesJson + "}";
+        });
+
+        // save schedule route
+        post("/api/saveschedule", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+
+            if (currentUser.getUserID() == userID) {
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+                data.SaveSchedule(schedule);
+                data.CloseConnection();
+                return "{\"status\": \"success\", \"message\": \"Schedule saved\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        // set major year route
+        put("/api/setmajoryear", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            String major = req.queryParams("major");
+            int year = Integer.parseInt(req.queryParams("year"));
+
+            if (currentUser.getUserID() == userID) {
+                try {
+                    User user = data.GetUserByEmail(currentUser.getEmail());
+                    user.setMajor(major);
+                    user.setYear(year);
+                    data.CloseConnection();
+                } catch (Exception e) {
+                    res.status(501);
+                    return "{\"status\": \"error\", \"message\": " + e.getMessage() + "}";
+                }
+                return "{\"status\": \"success\", \"message\": \"Major and year updated\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
         });
     }
 }

@@ -20,9 +20,12 @@ function HomeComponent() {
         });
         if (response.data.status === 'success') {
           setSchedules(response.data.schedules);
+        } else {
+            navigate(`/`);
         }
       } catch (error) {
         console.error(error.response?.data.message);
+        navigate(`/`);
       }
     };
 
@@ -60,7 +63,7 @@ function HomeComponent() {
         navigate(`/schedule/${userID}/${response.data.schedule.scheduleID}/view/`, {
           state: {
             schedule: response.data.schedule,
-            credits: response.data.credits,
+            credits: 0,
             courses: response.data.courses,
             schedules
           }
@@ -87,18 +90,21 @@ function HomeComponent() {
   return (
     <div className="container">
       <h1>Welcome {user ? user.name : 'User'}!</h1>
-      <h2>Your Schedules:</h2>
-      <ul>
-        {schedules.length > 0 ? schedules.map((schedule, index) => (
-          <li key={index} className="card">
-            <span onClick={() => handleScheduleClick(schedule.scheduleID)}>
-              {schedule.name}
-            </span>
-            <button onClick={() => handleDeleteSchedule(schedule.scheduleID)}>X</button>
-          </li>
-        )) : <li>No schedules available</li>}
-      </ul>
-      <button onClick={() => setIsModalOpen(true)} className="create-button">Create Schedule</button>
+      <div className="schedules-container">
+        <div className="schedules-list">
+          <ul>
+            {schedules.length > 0 ? schedules.map((schedule, index) => (
+              <li key={index} className="card">
+                <span onClick={() => handleScheduleClick(schedule.scheduleID)}>
+                  {schedule.name}
+                </span>
+                <button onClick={() => handleDeleteSchedule(schedule.scheduleID)}>X</button>
+              </li>
+            )) : <li>No schedules available</li>}
+          </ul>
+          <button onClick={() => setIsModalOpen(true)} className="create-button">+ New</button>
+        </div>
+      </div>
       <CreateScheduleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

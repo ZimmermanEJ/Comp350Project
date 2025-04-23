@@ -57,13 +57,16 @@ button:hover {
 }
 
 .create-button {
-  float: right;
   background-color: #007bff;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  width: 100px;
+  height: 50px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .create-button:hover {
@@ -130,4 +133,15 @@ button:hover {
 
 .close-button:hover {
   background-color: #c82333;
+}
+
+.schedules-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.schedules-list {
+  flex: 1;
 }

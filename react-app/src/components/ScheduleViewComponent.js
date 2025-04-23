@@ -47,7 +47,7 @@ function ScheduleViewComponent() {
     return (
       <>
         <div>
-          <h2>{schedule.name} - {credits} credits</h2>
+          <h1>{schedule.name} - {credits} credits</h1>
           <table>
             <thead>
               <tr>
@@ -116,7 +116,6 @@ function ScheduleViewComponent() {
     <div>
       {schedule ? (
         <>
-          <h1>Viewing {schedule.name}</h1>
           {renderScheduleView(schedule)}
         </>
       ) : (

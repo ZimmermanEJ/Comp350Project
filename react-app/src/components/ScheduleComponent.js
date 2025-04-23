@@ -1,18 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, NavLink, Route, Routes, useParams, useLocation, useNavigate } from 'react-router-dom';
 import ScheduleViewComponent from './ScheduleViewComponent';
 import SearchComponent from './SearchComponent';
+import StatusSheetComponent from './StatusSheetComponent';
 import '../Schedule.css'; // Import the CSS file
 
 function ScheduleComponent() {
   const { userID, scheduleID } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const schedule = location.state?.schedule;
+  const [schedule, setSchedule] = useState([]);
   const credits = location.state?.credits;
   const schedules = location.state?.schedules;
   const courses = location.state?.courses;
+
+  useEffect(() => {
+      const fetchSchedule = async () => {
+        try {
+          const response = await axios.get('http://localhost:4567/api/schedule', {
+            params: { userID, scheduleID }
+          });
+          if (response.data.status === 'success') {
+            setSchedule(response.data.schedule);
+          } else {
+              navigate(`/`);
+          }
+        } catch (error) {
+          console.error(error.response?.data.message);
+          navigate(`/`);
+        }
+      };
+
+      fetchSchedule();
+    }, [userID, scheduleID]);
 
   const handleNavClick = async (path, state) => {
       if (path === '/') {
@@ -22,10 +43,28 @@ function ScheduleComponent() {
         } catch (error) {
           console.error('Logout failed:', error.response?.data.message);
         }
+      } else if (path === `/home/${userID}`) {
+        handleSaveSchedule();
       } else {
         navigate(path, { state });
       }
   };
+
+  const handleSaveSchedule = async () => {
+    try {
+      const response = await axios.post('http://localhost:4567/api/saveschedule', null, {
+        params: { userID, scheduleID }
+      });
+      if (response.data.status === 'success') {
+        console.log('Schedule saved successfully');
+        navigate(`/home/${userID}`, { state: { schedules } });
+      } else {
+        console.error('Failed to save schedule:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error saving schedule:', error.response?.data.message);
+    }
+  }
 
   return (
     <div className="ScheduleComponent">
@@ -47,7 +86,7 @@ function ScheduleComponent() {
               </NavLink>
             </div>
           </li>
-          <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/search`, { schedule, credits, schedules, courses })}>
+          <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/search/`, { schedule, credits, schedules, courses })}>
             <div>
               <NavLink
                 to={`/schedule/${userID}/${scheduleID}/search/`}
@@ -57,6 +96,17 @@ function ScheduleComponent() {
                 Search
               </NavLink>
             </div>
+          </li>
+          <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/statussheet/`, { schedule, credits, schedules, courses })}>
+              <div>
+                <NavLink
+                  to={`/schedule/${userID}/${scheduleID}/statussheet`}
+                  state={{ schedule, credits, schedules }}
+                  className={({ isActive }) => isActive ? 'active' : ''}
+                >
+                  Status Sheet
+                </NavLink>
+              </div>
           </li>
           <li className="nav-item" onClick={() => handleNavClick(`/`, {})}>
             <div>
@@ -68,6 +118,7 @@ function ScheduleComponent() {
       <Routes>
         <Route path="view/" element={<ScheduleViewComponent schedule={schedule} />} />
         <Route path="search/" element={<SearchComponent schedule={schedule} />} />
+        <Route path="statussheet/" element={<StatusSheetComponent schedule={schedule} />} />
       </Routes>
     </div>
   );
