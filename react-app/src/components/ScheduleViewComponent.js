@@ -44,10 +44,27 @@ function ScheduleViewComponent() {
       }
     }
 
+    const handleExportSchedule = async () => {
+      try {
+        const response = await axios.post('http://localhost:4567/api/signup', null, {
+            params: {
+              userID: schedule.userID,
+              scheduleID: schedule.scheduleID,
+              fileName: "temp"
+            }
+        });
+      } catch (error) {
+        console.error('Error exporting schedule:', error);
+      }
+    };
+
     return (
       <>
         <div>
-          <h1>{schedule.name} - {credits} credits</h1>
+          <div>
+            <h1>{schedule.name} - {credits} credits</h1>
+            <button className="export-button" onClick={() => handleExportSchedule()}>Export</button>
+          </div>
           <table>
             <thead>
               <tr>

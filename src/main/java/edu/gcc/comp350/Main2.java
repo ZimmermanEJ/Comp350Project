@@ -267,7 +267,7 @@ public class Main2 {
 
 
         // add course route
-        post("/api/addToSchedule", (req, res) -> {
+        put("/api/addToSchedule", (req, res) -> {
             res.type("application/json");
             try {
                 int userID = Integer.parseInt(req.queryParams("userID"));
@@ -293,6 +293,8 @@ public class Main2 {
 
                 String conflict = schedule.addCourse(course);
                 if (conflict == null) {
+                    data.SaveSchedule(schedule);
+                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Course added\"}";
                 }
                 return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
@@ -305,6 +307,27 @@ public class Main2 {
                 res.status(500);
                 return "{\"status\": \"error\", \"message\": \"Internal server error\"}";
             }
+        });
+
+        // export schedule route
+        post("/api/exportSchedule", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+            String fileName = req.queryParams("fileName");
+
+            if (currentUser.getUserID() == userID) {
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+                String scheduleJson = gson.toJson(schedule);
+                schedule.exportSchedule(fileName);
+                return "{\"status\": \"success\", \"message\": \"Schedule exported\", \"schedule\": " + scheduleJson + "}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
         });
     }
 }
