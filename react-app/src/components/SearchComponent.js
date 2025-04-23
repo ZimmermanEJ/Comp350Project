@@ -38,10 +38,12 @@ function SearchComponent() {
                 console.log('User ID:', schedule.userID);
                 console.log('Reference Number:', course.referenceNumber);
 
-                const response = await axios.post('http://localhost:4567/api/addToSchedule', {
-                   userID: schedule.userID,
-                   scheduleID: schedule.scheduleID,
-                   referenceNumber: course.referenceNumber
+                const response = await axios.put('http://localhost:4567/api/addToSchedule',null, {
+                    params: {
+                        scheduleID: schedule.scheduleID,
+                        userID: schedule.userID,
+                        referenceNumber: course.referenceNumber
+                    }
                 });
                 if (response.data.status === 'success') {
                     alert(`Course ${course.department} ${course.courseNumber} added to schedule!`);

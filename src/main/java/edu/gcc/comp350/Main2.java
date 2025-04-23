@@ -208,8 +208,9 @@ public class Main2 {
         });
 
 
+
         // add course route
-        post("/api/addToSchedule", (req, res) -> {
+        put("/api/addToSchedule", (req, res) -> {
             res.type("application/json");
             try {
                 int userID = Integer.parseInt(req.queryParams("userID"));
@@ -235,6 +236,8 @@ public class Main2 {
 
                 String conflict = schedule.addCourse(course);
                 if (conflict == null) {
+                    data.SaveSchedule(schedule);
+                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Course added\"}";
                 }
                 return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
@@ -248,5 +251,11 @@ public class Main2 {
                 return "{\"status\": \"error\", \"message\": \"Internal server error\"}";
             }
         });
+
+
+
     }
+
+
+
 }
