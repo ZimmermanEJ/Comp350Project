@@ -67,6 +67,7 @@ function StatusSheetComponent() {
             <div>
               <label htmlFor="major">Major: </label>
               <select
+                className="dropdown"
                 id="major"
                 value={major}
                 onChange={(e) => setMajor(e.target.value)}
@@ -78,6 +79,7 @@ function StatusSheetComponent() {
             <div>
               <label htmlFor="year">Year: </label>
               <select
+                className="dropdown"
                 id="year"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
@@ -89,7 +91,7 @@ function StatusSheetComponent() {
                 <option value="2029">2029</option>
               </select>
             </div>
-            <button onClick={handleSave}>Save</button>
+            <button className='create-button' onClick={handleSave}>Save</button>
           </div>
         </div>
       )}

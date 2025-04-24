@@ -133,6 +133,7 @@ function SearchComponent() {
     return (
         <div>
             <input
+                className="search-input"
                 type="text"
                 placeholder="Enter search term"
                 value={searchTerm}
@@ -221,8 +222,8 @@ function SearchComponent() {
                         </div>
                         <div className="button-container">
                             <div className="top-buttons">
-                                <button onClick={applyFilters}>Apply Filters</button>
-                                <button onClick={clearFilters}>Clear Filters</button>
+                                <button className="filter-button" onClick={applyFilters}>Apply Filters</button>
+                                <button className="filter-button" onClick={clearFilters}>Clear Filters</button>
                                 <button className="close-button" onClick={toggleFilters}>Close</button>
                             </div>
                         </div>

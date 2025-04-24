@@ -81,6 +81,7 @@ function HomeComponent() {
       });
       if (response.data.status === 'success') {
         setSchedules(schedules.filter(schedule => schedule.scheduleID !== scheduleID));
+        alert("Schedule has been deleted.");
       }
     } catch (error) {
       console.error(error.response?.data.message);
