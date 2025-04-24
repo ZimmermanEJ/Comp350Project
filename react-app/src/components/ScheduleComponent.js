@@ -24,11 +24,11 @@ function ScheduleComponent() {
           if (response.data.status === 'success') {
             setSchedule(response.data.schedule);
           } else {
-              navigate(`/`);
+//              navigate(`/`);
           }
         } catch (error) {
           console.error(error.response?.data.message);
-          navigate(`/`);
+//          navigate(`/`);
         }
       };
 

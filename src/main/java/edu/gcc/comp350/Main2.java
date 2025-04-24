@@ -120,6 +120,7 @@ public class Main2 {
                 Schedule schedule = new Schedule(userID, name);
                 schedule = data.CreateNewSchedule(schedule);
                 String scheduleJson = gson.toJson(schedule);
+                data.SaveSchedule(schedule);
                 data.CloseConnection();
 
                 res.status(200);
