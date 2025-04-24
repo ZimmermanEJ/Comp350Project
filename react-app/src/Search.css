@@ -1,0 +1,173 @@
+/* Overlay styling */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal styling */
+.filter-modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  max-width: 90%;
+  z-index: 1001;
+  text-align: left;
+}
+
+/* Filter row styling */
+.filter-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Label styling */
+.filter-row label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
+}
+
+/* Search box styling */
+input[type="text"] {
+  width: 40%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Input styling */
+.filter-row input,
+.filter-row select {
+  flex: 2;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Filter button styling */
+button.filter-button {
+  display: block;
+  margin: 10px auto;
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button.filter-button:hover {
+  background-color: #c82333;
+}
+
+/* Button container styling */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Top buttons styling */
+.top-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Close button styling */
+button.close-button {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button.close-button:hover {
+  background-color: #c82333;
+}
+
+/* Content section styling */
+.content-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* List styling */
+.content-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.content-section li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  margin-bottom: 15px;
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.content-section li:hover {
+  background-color: #f7f7f7;
+  transform: translateY(-3px);
+}
+
+/* Course details styling */
+.content-section li .course-details {
+  flex: 1;
+  font-size: 16px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Course actions styling */
+.content-section li .course-actions {
+  margin-left: auto;
+}
+
+/* Button styling */
+.content-section li button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.content-section li button:hover {
+  background-color: #0056b3;
+}

@@ -251,6 +251,21 @@ public class Main2 {
         });
 
         //create search route
+//        get("/api/search", (req, res) -> {
+//            res.type("application/json");
+//            String searchString = req.queryParams("searchString");
+//            Scanner scan = new Scanner(searchString);
+//            ArrayList<String> keywords = new ArrayList<>();
+//            while (scan.hasNext()) {
+//                String word = scan.next();
+//                keywords.add(word);
+//            }
+//            Search s = new Search(keywords);
+//            s = data.GetCoursesSearch(s);
+//            String coursesJson = gson.toJson(s.getSearchResults());
+//            return "{\"status\": \"success\", \"message\": \"Courses retrieved\", \"courses\": " + coursesJson + "}";
+//        });
+
         get("/api/search", (req, res) -> {
             res.type("application/json");
             String searchString = req.queryParams("searchString");
@@ -260,10 +275,10 @@ public class Main2 {
                 String word = scan.next();
                 keywords.add(word);
             }
-            Search s = new Search(keywords);
-            s = data.GetCoursesSearch(s);
-            String coursesJson = gson.toJson(s.getSearchResults());
-            return "{\"status\": \"success\", \"message\": \"Courses retrieved\", \"courses\": " + coursesJson + "}";
+            Search search = new Search(keywords);
+            search = data.GetCoursesSearch(search); // Populate search results
+            String searchJson = gson.toJson(search);
+            return searchJson;
         });
 
 
