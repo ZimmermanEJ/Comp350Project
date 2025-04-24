@@ -20,15 +20,11 @@ nav {
   border-bottom: 1px solid #ddd;
 }
 
-.nav-item {
-  padding: 10px;
-}
-
 .nav-item a {
   text-decoration: none;
   flex: 1;
   text-align: center;
-  padding: 10px 100px;
+  padding: 10px 10px;
 }
 
 .nav-item a.active {
