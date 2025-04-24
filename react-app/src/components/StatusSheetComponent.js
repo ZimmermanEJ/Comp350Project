@@ -24,6 +24,7 @@ function StatusSheetComponent() {
             setImage(`/images/${response.data.user.major}${response.data.user.year}.png`);
           } else {
             setIsModalOpen(true);
+            setImage("/images/gcc.jpg");
           }
         } else {
           console.error('Failed to fetch user:', response.data.message);
@@ -94,7 +95,7 @@ function StatusSheetComponent() {
       )}
 
       <img
-        src={image || "/images/gcc.jpg"}
+        src={image || null}
         width="60%"
         height="60%"
         style={{ border: '2px solid black' }}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import ExportScheduleModal from './ExportScheduleModal';
 import '../ScheduleView.css';
 
 function ScheduleViewComponent() {
@@ -10,6 +11,7 @@ function ScheduleViewComponent() {
   const schedules = location.state?.schedules;
   const initialCourses = location.state?.courses;
   const [courses, setCourses] = useState(initialCourses);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const handleDropButton = async (referenceNumber) => {
     try {
@@ -44,15 +46,21 @@ function ScheduleViewComponent() {
       }
     }
 
-    const handleExportSchedule = async () => {
+
+
+    const handleExportSchedule = async (name) => {
       try {
-        const response = await axios.post('http://localhost:4567/api/signup', null, {
+        const response = await axios.post('http://localhost:4567/api/exportSchedule', null, {
             params: {
               userID: schedule.userID,
               scheduleID: schedule.scheduleID,
-              fileName: "temp"
+              fileName: name
             }
         });
+        if (response.data.status === 'success') {
+            window.open("https://calendar.google.com/calendar/u/0/r/settings/export", "_blank");
+            window.open("https://outlook.office.com/calendar/addcalendar", "_blank");
+        }
       } catch (error) {
         console.error('Error exporting schedule:', error);
       }
@@ -63,7 +71,7 @@ function ScheduleViewComponent() {
         <div>
           <div>
             <h1>{schedule.name} - {credits} credits</h1>
-            <button className="export-button" onClick={() => handleExportSchedule()}>Export</button>
+            <button onClick={() => setExportModalOpen(true)} className="floating-button">Export</button>
           </div>
           <table>
             <thead>
@@ -124,6 +132,11 @@ function ScheduleViewComponent() {
               <p>No events scheduled</p>
             )}
           </div>
+          <ExportScheduleModal
+              isOpen={exportModalOpen}
+              onClose={() => setExportModalOpen(false)}
+              onExport={handleExportSchedule}
+          />
         </div>
       </>
     );
