@@ -11,6 +11,7 @@ function SearchComponent() {
 
     const initialCourses = location.state?.courses;
     const [courses, setCourses] = useState(initialCourses);
+    const [canUndo, setCanUndo] = useState(location.state?.canUndo);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [initialResults, setInitialResults] = useState([]);
@@ -69,6 +70,7 @@ function SearchComponent() {
             if (response.data.status === 'success') {
                 setSchedule(response.data.schedule);
                 setCourses([...courses, course]);
+                setCanUndo(true);
                 alert(`Course ${course.department} ${course.courseNumber} added to schedule!`);
             } else {
                 alert(`Failed to add course: ${response.data.message}`);
@@ -130,8 +132,35 @@ function SearchComponent() {
         setFilteredResults(initialResults);
     };
 
+    const handleUndo = async () => {
+          try {
+            const response = await axios.put('http://localhost:4567/api/undo', null, {
+              params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
+            });
+            if (response.data.status === 'success') {
+                if (response.data.message === 'Course removed') {
+                    alert(response.data.course.title + " removed from schedule.");
+                } else if (response.data.message === 'Course added') {
+                    alert(response.data.course.title + " added to schedule.");
+                }
+
+                if (response.data.isLast == true) {
+                    setCanUndo(false);
+                }
+            } else if (response.data.status === 'error') {
+                alert(response.data.message);
+            }
+          } catch (error) {
+            console.error(error.response?.data.message);
+          }
+    }
+
     return (
+
         <div>
+            {canUndo && (
+                <button className="undo-button" onClick={handleUndo}>Undo</button>
+            )}
             <input
                 className="search-input"
                 type="text"

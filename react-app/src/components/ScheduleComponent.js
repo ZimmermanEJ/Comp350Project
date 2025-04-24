@@ -11,29 +11,31 @@ function ScheduleComponent() {
   const location = useLocation();
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState([]);
-  const credits = location.state?.credits;
+  const [credits, setCredits] = useState(location.state?.credits);
   const schedules = location.state?.schedules;
-  const courses = location.state?.courses;
+  const [courses, setCourses] = useState(location.state?.courses);
+
+  const fetchSchedule = async () => {
+      try {
+        const response = await axios.get('http://localhost:4567/api/schedule', {
+          params: { userID, scheduleID }
+        });
+        if (response.data.status === 'success') {
+          setCredits(response.data.credits)
+          setCourses(response.data.courses);
+          setSchedule(response.data.schedule);
+        } else {
+        //              navigate(`/`);
+        }
+      } catch (error) {
+        console.error(error.response?.data.message);
+        //        navigate(`/`);
+      }
+  };
 
   useEffect(() => {
-      const fetchSchedule = async () => {
-        try {
-          const response = await axios.get('http://localhost:4567/api/schedule', {
-            params: { userID, scheduleID }
-          });
-          if (response.data.status === 'success') {
-            setSchedule(response.data.schedule);
-          } else {
-//              navigate(`/`);
-          }
-        } catch (error) {
-          console.error(error.response?.data.message);
-//          navigate(`/`);
-        }
-      };
-
-      fetchSchedule();
-    }, [userID, scheduleID]);
+    fetchSchedule();
+  }, [userID, scheduleID]);
 
   const handleNavClick = async (path, state) => {
       if (path === '/') {
@@ -52,15 +54,14 @@ function ScheduleComponent() {
 
   const handleSaveSchedule = async () => {
     try {
-      const response = await axios.post('http://localhost:4567/api/saveschedule', null, {
-        params: { userID, scheduleID }
-      });
-      if (response.data.status === 'success') {
-        console.log('Schedule saved successfully');
-        navigate(`/home/${userID}`, { state: { schedules } });
-      } else {
-        console.error('Failed to save schedule:', response.data.message);
-      }
+        const response = await axios.post('http://localhost:4567/api/undo', null, {
+          params: { userID, scheduleID }
+        });
+        if (response.data.status === 'success') {
+          console.log('Schedule saved successfully');
+        } else {
+          console.error('Failed to save schedule:', response.data.message);
+        }
     } catch (error) {
       console.error('Error saving schedule:', error.response?.data.message);
     }
