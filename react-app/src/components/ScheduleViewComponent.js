@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import ExportScheduleModal from './ExportScheduleModal';
@@ -6,12 +6,30 @@ import '../ScheduleView.css';
 
 function ScheduleViewComponent() {
   const location = useLocation();
-  const schedule = location.state?.schedule;
-  const credits = location.state?.credits;
+  const [schedule, setSchedule] = useState(location.state?.schedule);
+  const [credits, setCredits] = useState(location.state?.credits);
   const schedules = location.state?.schedules;
   const initialCourses = location.state?.courses;
   const [courses, setCourses] = useState(initialCourses);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+
+  useEffect(() => {
+      const fetchSchedule = async (scheduleID) => {
+        try {
+          const response = await axios.get('http://localhost:4567/api/schedule', {
+            params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
+          });
+          if (response.data.status === 'success') {
+            setCredits(response.data.credits)
+            setCourses(response.data.courses);
+            setSchedule(response.data.schedule);
+          }
+        } catch (error) {
+          console.error(error.response?.data.message);
+        }
+      };
+      fetchSchedule();
+  }, [schedule.scheduleID]);
 
   const handleDropButton = async (referenceNumber) => {
     try {
@@ -23,8 +41,11 @@ function ScheduleViewComponent() {
         }
       });
       if (response.data.status === 'success') {
-        console.log('Course deleted successfully');
+        const course = courses.find(course => course.referenceNumber === referenceNumber);
         setCourses(courses.filter(course => course.referenceNumber !== referenceNumber));
+        setCredits(credits - course.credits);
+        setSchedule(response.data.schedule);
+        alert(course.title + " has been dropped from your schedule.");
       }
     } catch (error) {
       if (error.response != null) {
@@ -35,20 +56,7 @@ function ScheduleViewComponent() {
     }
   };
 
-  const renderScheduleView = (schedule) => {
-    if (!schedule) return null;
-
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const hours = [];
-    for (let hour = 8; hour < 21; hour++) {
-      for (let minute = 0; minute <= 45; minute += 15) {
-        hours.push(hour + minute / 100);
-      }
-    }
-
-
-
-    const handleExportSchedule = async (name) => {
+  const handleExportSchedule = async (name) => {
       try {
         const response = await axios.post('http://localhost:4567/api/exportSchedule', null, {
             params: {
@@ -64,7 +72,18 @@ function ScheduleViewComponent() {
       } catch (error) {
         console.error('Error exporting schedule:', error);
       }
-    };
+  };
+
+  const renderScheduleView = (schedule) => {
+    if (!schedule) return null;
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const hours = [];
+    for (let hour = 8; hour < 21; hour++) {
+      for (let minute = 0; minute <= 45; minute += 15) {
+        hours.push(hour + minute / 100);
+      }
+    }
 
     return (
       <>

@@ -169,7 +169,8 @@ public class Main2 {
                 }
                 boolean rem = schedule.removeCourse(referenceNumber);
                 if (rem) {
-                    return "{\"status\": \"success\", \"message\": \"Course deleted\"}";
+                    String scheduleJson = gson.toJson(schedule);
+                    return "{\"status\": \"success\", \"message\": \"Course removed\", \"schedule\": " + scheduleJson + "}";
                 }
                 res.status(404);
                 return "{\"status\": \"error\", \"message\": \"Course not found\"}";
@@ -309,9 +310,11 @@ public class Main2 {
 
                 String conflict = schedule.addCourse(course);
                 if (conflict == null) {
+                    String scheduleJson = gson.toJson(schedule);
+                    String newCourseJson = gson.toJson(course);
                     data.SaveSchedule(schedule);
                     data.CloseConnection();
-                    return "{\"status\": \"success\", \"message\": \"Course added\"}";
+                    return "{\"status\": \"success\", \"message\": \"Course added\", \"schedule\": " + scheduleJson + ", \"course\": " + newCourseJson + "}";
                 }
                 return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
             } catch (NumberFormatException e) {
