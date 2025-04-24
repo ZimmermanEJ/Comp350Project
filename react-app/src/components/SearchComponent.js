@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import '../Search.css';
-//
+
 function SearchComponent() {
     const location = useLocation();
     const schedule = location.state?.schedule;
@@ -17,10 +17,12 @@ function SearchComponent() {
         courseNumber: '',
         courseSection: '',
         days: '',
-        startTime: '',
-        endTime: '',
-        professor: ''
+        professor: '',
+        timeRangeStart: '',
+        timeRangeEnd: ''
     });
+    const [showDescription, setShowDescription] = useState(false);
+    const [selectedDescription, setSelectedDescription] = useState('');
 
     const handleInputChange = (event) => {
         setSearchTerm(event.target.value);
@@ -41,9 +43,9 @@ function SearchComponent() {
                     courseNumber: '',
                     courseSection: '',
                     days: '',
-                    startTime: '',
-                    endTime: '',
-                    professor: ''
+                    professor: '',
+                    timeRangeStart: '',
+                    timeRangeEnd: ''
                 });
                 setShowFilters(false);
             } catch (error) {
@@ -89,23 +91,59 @@ function SearchComponent() {
         }
     };
 
-    const applyFilters = () => {
-        const filtered = initialResults.filter((course) => {
-            const selectedStartTime = parseFloat(selectedFilters.startTime) || 0;
-            const selectedEndTime = parseFloat(selectedFilters.endTime) || 0;
+    const applyFilters = async () => {
+        if (initialResults.length === 0) {
+            try {
+                const response = await axios.get('http://localhost:4567/api/search', {
+                    params: { searchString: searchTerm }
+                });
+                const searchResults = response.data.searchResults;
+                setInitialResults(searchResults);
+                setFilteredResults(searchResults);
 
-            return (
-                (!selectedFilters.credits || course.credits === parseInt(selectedFilters.credits)) &&
-                (!selectedFilters.department || course.department.toLowerCase().includes(selectedFilters.department.toLowerCase())) &&
-                (!selectedFilters.courseNumber || course.courseNumber === parseInt(selectedFilters.courseNumber)) &&
-                (!selectedFilters.courseSection || course.sectionCode.toLowerCase().includes(selectedFilters.courseSection.toLowerCase())) &&
-                (!selectedFilters.days || course.days.toLowerCase().includes(selectedFilters.days.toLowerCase())) &&
-                (!selectedFilters.startTime || course.startTime === selectedStartTime) &&
-                (!selectedFilters.endTime || course.endTime === selectedEndTime) &&
-                (!selectedFilters.professor || course.professor.toLowerCase().includes(selectedFilters.professor.toLowerCase()))
-            );
-        });
-        setFilteredResults(filtered);
+                // Proceed with filtering after search results are set
+                const filtered = searchResults.filter((course) => {
+                    const timeRangeStart = parseFloat(selectedFilters.timeRangeStart) || 0;
+                    const timeRangeEnd = parseFloat(selectedFilters.timeRangeEnd) || 24;
+
+                    return (
+                        (!selectedFilters.credits || course.credits === parseInt(selectedFilters.credits)) &&
+                        (!selectedFilters.department || course.department.toLowerCase().includes(selectedFilters.department.toLowerCase())) &&
+                        (!selectedFilters.courseNumber || course.courseNumber === parseInt(selectedFilters.courseNumber)) &&
+                        (!selectedFilters.courseSection || course.sectionCode.toLowerCase().includes(selectedFilters.courseSection.toLowerCase())) &&
+                        (!selectedFilters.days || course.days.toLowerCase().includes(selectedFilters.days.toLowerCase())) &&
+                        (!selectedFilters.professor || course.professor.toLowerCase().includes(selectedFilters.professor.toLowerCase())) &&
+                        (!selectedFilters.timeRangeStart || course.startTime >= timeRangeStart) &&
+                        (!selectedFilters.timeRangeEnd || course.endTime <= timeRangeEnd) &&
+                        (!selectedFilters.timeRangeStart || !selectedFilters.timeRangeEnd ||
+                            (course.startTime >= timeRangeStart && course.endTime <= timeRangeEnd))
+                    );
+                });
+                setFilteredResults(filtered);
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+            }
+        } else {
+            // If initialResults already exist, apply filters directly
+            const filtered = initialResults.filter((course) => {
+                const timeRangeStart = parseFloat(selectedFilters.timeRangeStart) || 0;
+                const timeRangeEnd = parseFloat(selectedFilters.timeRangeEnd) || 24;
+
+                return (
+                    (!selectedFilters.credits || course.credits === parseInt(selectedFilters.credits)) &&
+                    (!selectedFilters.department || course.department.toLowerCase().includes(selectedFilters.department.toLowerCase())) &&
+                    (!selectedFilters.courseNumber || course.courseNumber === parseInt(selectedFilters.courseNumber)) &&
+                    (!selectedFilters.courseSection || course.sectionCode.toLowerCase().includes(selectedFilters.courseSection.toLowerCase())) &&
+                    (!selectedFilters.days || course.days.toLowerCase().includes(selectedFilters.days.toLowerCase())) &&
+                    (!selectedFilters.professor || course.professor.toLowerCase().includes(selectedFilters.professor.toLowerCase())) &&
+                    (!selectedFilters.timeRangeStart || course.startTime >= timeRangeStart) &&
+                    (!selectedFilters.timeRangeEnd || course.endTime <= timeRangeEnd) &&
+                    (!selectedFilters.timeRangeStart || !selectedFilters.timeRangeEnd ||
+                        (course.startTime >= timeRangeStart && course.endTime <= timeRangeEnd))
+                );
+            });
+            setFilteredResults(filtered);
+        }
         setShowFilters(false);
     };
 
@@ -116,11 +154,21 @@ function SearchComponent() {
             courseNumber: '',
             courseSection: '',
             days: '',
-            startTime: '',
-            endTime: '',
-            professor: ''
+            professor: '',
+            timeRangeStart: '',
+            timeRangeEnd: ''
         });
         setFilteredResults(initialResults);
+    };
+
+    const handleShowDescription = (description) => {
+        setSelectedDescription(description);
+        setShowDescription(true);
+    };
+
+    const handleCloseDescription = () => {
+        setShowDescription(false);
+        setSelectedDescription('');
     };
 
     return (
@@ -136,6 +184,7 @@ function SearchComponent() {
             {showFilters && (
                 <div className="overlay">
                     <div className="filter-modal" onKeyDown={handleKeyDown} tabIndex={0}>
+
                         <h3>Filter Options</h3>
                         <div className="filter-row">
                             <label>Credits:</label>
@@ -195,22 +244,65 @@ function SearchComponent() {
                             </select>
                         </div>
                         <div className="filter-row">
-                            <label>Start Time:</label>
-                            <input
-                                type="time"
-                                name="startTime"
-                                value={selectedFilters.startTime}
+                            <label>Time Range Start:</label>
+                            <select
+                                name="timeRangeStart"
+                                value={selectedFilters.timeRangeStart}
                                 onChange={handleFilterChange}
-                            />
+                            >
+                                <option value="">Select Start Time</option>
+                                <option value="8">8:00 AM</option>
+                                <option value="8.3">8:30 AM</option>
+                                <option value="9">9:00 AM</option>
+                                <option value="9.3">9:30 AM</option>
+                                <option value="10">10:00 AM</option>
+                                <option value="10.3">10:30 AM</option>
+                                <option value="11">11:00 AM</option>
+                                <option value="11.3">11:30 AM</option>
+                                <option value="12">12:00 PM</option>
+                                <option value="12.3">12:30 PM</option>
+                                <option value="13">1:00 PM</option>
+                                <option value="13.3">1:30 PM</option>
+                                <option value="14">2:00 PM</option>
+                                <option value="14.3">2:30 PM</option>
+                                <option value="15">3:00 PM</option>
+                                <option value="15.3">3:30 PM</option>
+                                <option value="16">4:00 PM</option>
+                                <option value="16.3">4:30 PM</option>
+                                <option value="17">5:00 PM</option>
+                                <option value="17.3">5:30 PM</option>
+                                <option value="18">6:00 PM</option>
+                            </select>
                         </div>
                         <div className="filter-row">
-                            <label>End Time:</label>
-                            <input
-                                type="time"
-                                name="endTime"
-                                value={selectedFilters.endTime}
+                            <label>Time Range End:</label>
+                            <select
+                                name="timeRangeEnd"
+                                value={selectedFilters.timeRangeEnd}
                                 onChange={handleFilterChange}
-                            />
+                            >
+                                <option value="">Select End Time</option>
+                                <option value="8.3">8:30 AM</option>
+                                <option value="9">9:00 AM</option>
+                                <option value="9.3">9:30 AM</option>
+                                <option value="10">10:00 AM</option>
+                                <option value="10.3">10:30 AM</option>
+                                <option value="11">11:00 AM</option>
+                                <option value="11.3">11:30 AM</option>
+                                <option value="12">12:00 PM</option>
+                                <option value="12.3">12:30 PM</option>
+                                <option value="13">1:00 PM</option>
+                                <option value="13.3">1:30 PM</option>
+                                <option value="14">2:00 PM</option>
+                                <option value="14.3">2:30 PM</option>
+                                <option value="15">3:00 PM</option>
+                                <option value="15.3">3:30 PM</option>
+                                <option value="16">4:00 PM</option>
+                                <option value="16.3">4:30 PM</option>
+                                <option value="17">5:00 PM</option>
+                                <option value="17.3">5:30 PM</option>
+                                <option value="18">6:00 PM</option>
+                            </select>
                         </div>
                         <div className="button-container">
                             <div className="top-buttons">
@@ -226,9 +318,16 @@ function SearchComponent() {
             {filteredResults.length > 0 ? (
                 <ul className="content-section">
                     {filteredResults.map((course, index) => (
-                        <li key={index}>
+                        <li key={index} className="course-item">
+                            <div
+                                className="description-box"
+                                onClick={() => handleShowDescription(course.description)}
+                                title="Click to view description"
+                            >
+                                i
+                            </div>
                             <div className="course-details">
-                                {course.department} {course.courseNumber} {course.sectionCode}, Ref: {course.referenceNumber}
+                                {course.department} {course.courseNumber} {course.sectionCode}: {course.title} , Ref: {course.referenceNumber}
                             </div>
                             <div className="course-actions">
                                 <button onClick={() => handleAddToSchedule(course)}>Add to Schedule</button>
@@ -238,6 +337,15 @@ function SearchComponent() {
                 </ul>
             ) : (
                 <p>No search results to display</p>
+            )}
+            {showDescription && (
+                <div className="overlay">
+                    <div className="description-modal">
+                        <h3>Course Description</h3>
+                        <p>{selectedDescription}</p>
+                        <button onClick={handleCloseDescription}>Close</button>
+                    </div>
+                </div>
             )}
         </div>
     );
