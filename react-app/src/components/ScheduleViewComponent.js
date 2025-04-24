@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import ExportScheduleModal from './ExportScheduleModal';
 import '../ScheduleView.css';
 
 function ScheduleViewComponent() {
   const location = useLocation();
-  const schedule = location.state?.schedule;
-  const credits = location.state?.credits;
+  const [schedule, setSchedule] = useState(location.state?.schedule);
+  const [credits, setCredits] = useState(location.state?.credits);
   const schedules = location.state?.schedules;
   const initialCourses = location.state?.courses;
   const [courses, setCourses] = useState(initialCourses);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+
+  useEffect(() => {
+      const fetchSchedule = async (scheduleID) => {
+        try {
+          const response = await axios.get('http://localhost:4567/api/schedule', {
+            params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
+          });
+          if (response.data.status === 'success') {
+            setCredits(response.data.credits)
+            setCourses(response.data.courses);
+            setSchedule(response.data.schedule);
+          }
+        } catch (error) {
+          console.error(error.response?.data.message);
+        }
+      };
+      fetchSchedule();
+  }, [schedule.scheduleID]);
 
   const handleDropButton = async (referenceNumber) => {
     try {
@@ -21,8 +41,11 @@ function ScheduleViewComponent() {
         }
       });
       if (response.data.status === 'success') {
-        console.log('Course deleted successfully');
+        const course = courses.find(course => course.referenceNumber === referenceNumber);
         setCourses(courses.filter(course => course.referenceNumber !== referenceNumber));
+        setCredits(credits - course.credits);
+        setSchedule(response.data.schedule);
+        alert(course.title + " has been dropped from your schedule.");
       }
     } catch (error) {
       if (error.response != null) {
@@ -31,6 +54,24 @@ function ScheduleViewComponent() {
         console.error('Error:', error);
       }
     }
+  };
+
+  const handleExportSchedule = async (name) => {
+      try {
+        const response = await axios.post('http://localhost:4567/api/exportSchedule', null, {
+            params: {
+              userID: schedule.userID,
+              scheduleID: schedule.scheduleID,
+              fileName: name
+            }
+        });
+        if (response.data.status === 'success') {
+            window.open("https://calendar.google.com/calendar/u/0/r/settings/export", "_blank");
+            window.open("https://outlook.office.com/calendar/addcalendar", "_blank");
+        }
+      } catch (error) {
+        console.error('Error exporting schedule:', error);
+      }
   };
 
   const renderScheduleView = (schedule) => {
@@ -44,26 +85,12 @@ function ScheduleViewComponent() {
       }
     }
 
-    const handleExportSchedule = async () => {
-      try {
-        const response = await axios.post('http://localhost:4567/api/signup', null, {
-            params: {
-              userID: schedule.userID,
-              scheduleID: schedule.scheduleID,
-              fileName: "temp"
-            }
-        });
-      } catch (error) {
-        console.error('Error exporting schedule:', error);
-      }
-    };
-
     return (
       <>
         <div>
           <div>
             <h1>{schedule.name} - {credits} credits</h1>
-            <button className="export-button" onClick={() => handleExportSchedule()}>Export</button>
+            <button onClick={() => setExportModalOpen(true)} className="floating-button">Export</button>
           </div>
           <table>
             <thead>
@@ -124,6 +151,11 @@ function ScheduleViewComponent() {
               <p>No events scheduled</p>
             )}
           </div>
+          <ExportScheduleModal
+              isOpen={exportModalOpen}
+              onClose={() => setExportModalOpen(false)}
+              onExport={handleExportSchedule}
+          />
         </div>
       </>
     );

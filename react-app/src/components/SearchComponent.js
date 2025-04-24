@@ -5,7 +5,12 @@ import '../Search.css';
 //
 function SearchComponent() {
     const location = useLocation();
-    const schedule = location.state?.schedule;
+
+    const initialSchedule = location.state?.schedule;
+    const [schedule, setSchedule] = useState(initialSchedule);
+
+    const initialCourses = location.state?.courses;
+    const [courses, setCourses] = useState(initialCourses);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [initialResults, setInitialResults] = useState([]);
@@ -62,6 +67,8 @@ function SearchComponent() {
                 }
             });
             if (response.data.status === 'success') {
+                setSchedule(response.data.schedule);
+                setCourses([...courses, course]);
                 alert(`Course ${course.department} ${course.courseNumber} added to schedule!`);
             } else {
                 alert(`Failed to add course: ${response.data.message}`);

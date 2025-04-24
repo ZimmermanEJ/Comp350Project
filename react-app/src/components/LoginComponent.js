@@ -19,8 +19,6 @@ function LoginComponent() {
         }
       });
       if (response.data.status === 'success') {
-        // Redirect to the home page with user data
-        console.log(response.data);
         navigate(`/home/${response.data.user.userID}`, { state: { user: response.data.user, schedules: response.data.schedules } });
       }
     } catch (error) {
