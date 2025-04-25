@@ -241,4 +241,8 @@ public class Schedule {
     public void setId(ObjectId id) {
         this._id = id;
     }
+
+    public String getName() {
+       return scheduleName;
+    }
 }
