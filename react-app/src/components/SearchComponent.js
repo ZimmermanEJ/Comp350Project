@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import '../Search.css';
@@ -28,6 +28,12 @@ function SearchComponent() {
     });
     const [showDescription, setShowDescription] = useState(false);
     const [selectedDescription, setSelectedDescription] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+
+
+
+
 
     const handleInputChange = (event) => {
         setSearchTerm(event.target.value);
@@ -59,6 +65,8 @@ function SearchComponent() {
         }
     };
 
+
+
     const handleAddToSchedule = async (course) => {
         try {
             const response = await axios.put('http://localhost:4567/api/addToSchedule', null, {
@@ -71,7 +79,7 @@ function SearchComponent() {
             if (response.data.status === 'success') {
                 setSchedule(response.data.schedule);
                 setCourses([...courses, course]);
-                alert(`Course ${course.department} ${course.courseNumber} added to schedule!`);
+
             } else {
                 alert(`Failed to add course: ${response.data.message}`);
             }
@@ -108,7 +116,6 @@ function SearchComponent() {
                 setInitialResults(searchResults);
                 setFilteredResults(searchResults);
 
-                // Proceed with filtering after search results are set
                 const filtered = searchResults.filter((course) => {
                     const timeRangeStart = parseFloat(selectedFilters.timeRangeStart) || 0;
                     const timeRangeEnd = parseFloat(selectedFilters.timeRangeEnd) || 24;
@@ -131,7 +138,6 @@ function SearchComponent() {
                 console.error('Error fetching search results:', error);
             }
         } else {
-            // If initialResults already exist, apply filters directly
             const filtered = initialResults.filter((course) => {
                 const timeRangeStart = parseFloat(selectedFilters.timeRangeStart) || 0;
                 const timeRangeEnd = parseFloat(selectedFilters.timeRangeEnd) || 24;
@@ -168,7 +174,27 @@ function SearchComponent() {
         setFilteredResults(initialResults);
     };
 
-    const handleShowDescription = (description) => {
+    const handleShowDescription = (course) => {
+
+            const formatTime = (time) => {
+                if (!time) return "N/A";
+                const hours = Math.floor(time); // Extract the hour part
+                const minutes = Math.round((time % 1) * 100); // Extract the exact minutes from the decimal
+                const period = hours >= 12 ? "PM" : "AM"; // Determine AM/PM
+                const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+                const formattedMinutes = minutes.toString().padStart(2, "0"); // Ensure two-digit format for minutes
+                return `${formattedHours}:${formattedMinutes} ${period}`;
+            };
+
+
+        const description = (
+            <div>
+                <p><strong>Professor:</strong> {course.professor || "Unknown"}</p>
+                <p><strong>Time:</strong> {formatTime(course.startTime)} to {formatTime(course.endTime)}</p>
+                <p><strong>Days:</strong> {course.days || "N/A"}</p>
+                <p><strong>Description:</strong> {course.description || "No description available"}</p>
+            </div>
+        );
         setSelectedDescription(description);
         setShowDescription(true);
     };
@@ -191,8 +217,8 @@ function SearchComponent() {
             {showFilters && (
                 <div className="overlay">
                     <div className="filter-modal" onKeyDown={handleKeyDown} tabIndex={0}>
-
                         <h3>Filter Options</h3>
+                        {/* Filter fields */}
                         <div className="filter-row">
                             <label>Credits:</label>
                             <input
@@ -328,16 +354,26 @@ function SearchComponent() {
                         <li key={index} className="course-item">
                             <div
                                 className="description-box"
-                                onClick={() => handleShowDescription(course.description)}
+                                onClick={() => handleShowDescription(course)}
                                 title="Click to view description"
                             >
                                 i
                             </div>
                             <div className="course-details">
-                                {course.department} {course.courseNumber} {course.sectionCode}: {course.title} , Ref: {course.referenceNumber}
+                                {course.department} {course.courseNumber} {course.sectionCode}: {course.title}
+
                             </div>
                             <div className="course-actions">
-                                <button onClick={() => handleAddToSchedule(course)}>Add to Schedule</button>
+                                <button
+                                    onClick={() => handleAddToSchedule(course)}
+                                    disabled={schedule?.courses?.includes(course.referenceNumber)}
+                                    style={{
+                                        backgroundColor: schedule?.courses?.includes(course.referenceNumber) ? 'darkblue' : '',
+                                        color: schedule?.courses?.includes(course.referenceNumber) ? 'white' : ''
+                                    }}
+                                >
+                                    {schedule?.courses?.includes(course.referenceNumber) ? 'Added' : 'Add to Schedule'}
+                                </button>
                             </div>
                         </li>
                     ))}
@@ -351,6 +387,14 @@ function SearchComponent() {
                         <h3>Course Description</h3>
                         <p>{selectedDescription}</p>
                         <button onClick={handleCloseDescription}>Close</button>
+                    </div>
+                </div>
+            )}
+            {showPopup && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <p>{popupMessage}</p>
+                        <button onClick={() => setShowPopup(false)}>Close</button>
                     </div>
                 </div>
             )}
