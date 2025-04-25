@@ -10,7 +10,8 @@ import static spark.Spark.*;
 
 public class Main2 {
 
-    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+    static IDataConnection data = new RemoteDataStorage();
+//    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
     static User currentUser;
     static ArrayList<Schedule> schedules;
     static Gson gson = new Gson();
@@ -121,7 +122,7 @@ public class Main2 {
                 schedule = data.CreateNewSchedule(schedule);
                 String scheduleJson = gson.toJson(schedule);
                 data.SaveSchedule(schedule);
-                data.CloseConnection();
+//                data.CloseConnection();
 
                 res.status(200);
                 return "{\"status\": \"success\", \"message\": \"Schedule created\", \"schedule\": " + scheduleJson + "}";
@@ -144,7 +145,7 @@ public class Main2 {
                 }
                 boolean del = data.DeleteSchedule(schedule);
                 if (del) {
-                    data.CloseConnection();
+//                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Schedule deleted\"}";
                 }
                 res.status(404);
@@ -170,6 +171,7 @@ public class Main2 {
                 boolean rem = schedule.removeCourse(referenceNumber);
                 if (rem) {
                     String scheduleJson = gson.toJson(schedule);
+                    data.SaveSchedule(schedule);
                     return "{\"status\": \"success\", \"message\": \"Course removed\", \"schedule\": " + scheduleJson + "}";
                 }
                 res.status(404);
@@ -201,7 +203,7 @@ public class Main2 {
 
             User newUser = new User(name, email, password);
             data.CreateNewUser(newUser);
-            data.CloseConnection();
+//            data.CloseConnection();
             currentUser = newUser;
             String userJson = gson.toJson(currentUser);
             String schedulesJson = gson.toJson(schedules);
@@ -221,7 +223,7 @@ public class Main2 {
                     return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
                 }
                 data.SaveSchedule(schedule);
-                data.CloseConnection();
+//                data.CloseConnection();
                 return "{\"status\": \"success\", \"message\": \"Schedule saved\"}";
             }
             res.status(401);
@@ -240,7 +242,7 @@ public class Main2 {
                     User user = data.GetUserByEmail(currentUser.getEmail());
                     user.setMajor(major);
                     user.setYear(year);
-                    data.CloseConnection();
+//                    data.CloseConnection();
                 } catch (Exception e) {
                     res.status(501);
                     return "{\"status\": \"error\", \"message\": " + e.getMessage() + "}";
@@ -313,7 +315,7 @@ public class Main2 {
                     String scheduleJson = gson.toJson(schedule);
                     String newCourseJson = gson.toJson(course);
                     data.SaveSchedule(schedule);
-                    data.CloseConnection();
+//                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Course added\", \"schedule\": " + scheduleJson + ", \"course\": " + newCourseJson + "}";
                 }
                 return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";

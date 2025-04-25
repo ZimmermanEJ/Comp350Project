@@ -12,7 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+    static IDataConnection data = //new LocalDataStorage("courses.json", "users.json", "schedules.json");
+            new RemoteDataStorage();
 
     public static void main(String[] args) {
         run();

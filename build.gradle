@@ -20,6 +20,8 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation 'com.google.code.gson:gson:2.12.1'
+    implementation(platform("org.mongodb:mongodb-driver-bom:5.4.0"))
+    implementation 'org.mongodb:mongodb-driver-sync:5.3.0'
     implementation 'com.sparkjava:spark-core:2.9.3'
     implementation 'org.slf4j:slf4j-api:1.7.32'    // Logging framework
     implementation 'org.slf4j:slf4j-simple:1.7.32' // Simple logger
