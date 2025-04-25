@@ -61,12 +61,19 @@ public class RemoteDataStorage implements IDataConnection {
         ArrayList<String> keywords = search.getKeywords();
         ArrayList<Bson> filters = new ArrayList<>();
 
-        for (String keyword : keywords) {
-            filters.add(new Document("title", new Document("$regex", keyword).append("$options", "i")));
+        if (!keywords.isEmpty()) {
+            for (String keyword : keywords) {
+                filters.add(new Document("title", new Document("$regex", keyword).append("$options", "i")));
+            }
+            ArrayList<Course> results = courses.find(new Document("$and", filters)).into(new ArrayList<>());
+            search.SetResults(results);
+        }
+        else {
+            ArrayList<Course> results = courses.find(new Document()).into(new ArrayList<>());
+            search.SetResults(results);
         }
 
-        ArrayList<Course> results = courses.find(new Document("$and", filters)).into(new ArrayList<>());
-        search.SetResults(results);
+
         return search;
     }
 
