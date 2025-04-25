@@ -10,7 +10,7 @@ import static spark.Spark.*;
 
 public class Main2 {
 
-    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+    static IDataConnection data = new RemoteDataStorage();//new LocalDataStorage("courses.json", "users.json", "schedules.json");
     static User currentUser;
     static ArrayList<Schedule> schedules;
     static Gson gson = new Gson();
