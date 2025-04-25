@@ -171,3 +171,34 @@ button.close-button:hover {
 .content-section li button:hover {
   background-color: #0056b3;
 }
+
+.description-box {
+  width: 30px;
+  height: 30px;
+  background-color: #007bff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.description-box:hover {
+  background-color: #0056b3;
+}
+
+.description-modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  z-index: 1001;
+}
