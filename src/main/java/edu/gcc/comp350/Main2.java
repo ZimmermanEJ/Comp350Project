@@ -2,6 +2,8 @@ package edu.gcc.comp350;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
+
 import com.google.gson.Gson;
 
 import static spark.Spark.*;
@@ -32,6 +34,18 @@ public class Main2 {
             res.header("Access-Control-Allow-Origin", "http://localhost:3000");  // Restrict to a specific origin
             res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        });
+
+        // get user route
+        get("/api/user", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            if (currentUser.getUserID() == userID) {
+                String userJson = gson.toJson(currentUser);
+                return "{\"status\": \"success\", \"message\": \"User retrieved\", \"user\": " + userJson + "}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
         });
 
         // Login route
@@ -106,6 +120,8 @@ public class Main2 {
                 Schedule schedule = new Schedule(userID, name);
                 schedule = data.CreateNewSchedule(schedule);
                 String scheduleJson = gson.toJson(schedule);
+                data.SaveSchedule(schedule);
+                data.CloseConnection();
 
                 res.status(200);
                 return "{\"status\": \"success\", \"message\": \"Schedule created\", \"schedule\": " + scheduleJson + "}";
@@ -128,6 +144,7 @@ public class Main2 {
                 }
                 boolean del = data.DeleteSchedule(schedule);
                 if (del) {
+                    data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Schedule deleted\"}";
                 }
                 res.status(404);
@@ -152,7 +169,8 @@ public class Main2 {
                 }
                 boolean rem = schedule.removeCourse(referenceNumber);
                 if (rem) {
-                    return "{\"status\": \"success\", \"message\": \"Course deleted\"}";
+                    String scheduleJson = gson.toJson(schedule);
+                    return "{\"status\": \"success\", \"message\": \"Course removed\", \"schedule\": " + scheduleJson + "}";
                 }
                 res.status(404);
                 return "{\"status\": \"error\", \"message\": \"Course not found\"}";
@@ -183,10 +201,152 @@ public class Main2 {
 
             User newUser = new User(name, email, password);
             data.CreateNewUser(newUser);
+            data.CloseConnection();
             currentUser = newUser;
             String userJson = gson.toJson(currentUser);
             String schedulesJson = gson.toJson(schedules);
             return "{\"status\": \"success\", \"message\": \"Login successful\", \"user\": " + userJson + ", \"schedules\": " + schedulesJson + "}";
+        });
+
+        // save schedule route
+        post("/api/saveschedule", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+
+            if (currentUser.getUserID() == userID) {
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+                data.SaveSchedule(schedule);
+                data.CloseConnection();
+                return "{\"status\": \"success\", \"message\": \"Schedule saved\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        // set major year route
+        put("/api/setmajoryear", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            String major = req.queryParams("major");
+            int year = Integer.parseInt(req.queryParams("year"));
+
+            if (currentUser.getUserID() == userID) {
+                try {
+                    User user = data.GetUserByEmail(currentUser.getEmail());
+                    user.setMajor(major);
+                    user.setYear(year);
+                    data.CloseConnection();
+                } catch (Exception e) {
+                    res.status(501);
+                    return "{\"status\": \"error\", \"message\": " + e.getMessage() + "}";
+                }
+                return "{\"status\": \"success\", \"message\": \"Major and year updated\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        //create search route
+//        get("/api/search", (req, res) -> {
+//            res.type("application/json");
+//            String searchString = req.queryParams("searchString");
+//            Scanner scan = new Scanner(searchString);
+//            ArrayList<String> keywords = new ArrayList<>();
+//            while (scan.hasNext()) {
+//                String word = scan.next();
+//                keywords.add(word);
+//            }
+//            Search s = new Search(keywords);
+//            s = data.GetCoursesSearch(s);
+//            String coursesJson = gson.toJson(s.getSearchResults());
+//            return "{\"status\": \"success\", \"message\": \"Courses retrieved\", \"courses\": " + coursesJson + "}";
+//        });
+
+        get("/api/search", (req, res) -> {
+            res.type("application/json");
+            String searchString = req.queryParams("searchString");
+            Scanner scan = new Scanner(searchString);
+            ArrayList<String> keywords = new ArrayList<>();
+            while (scan.hasNext()) {
+                String word = scan.next();
+                keywords.add(word);
+            }
+            Search search = new Search(keywords);
+            search = data.GetCoursesSearch(search); // Populate search results
+            String searchJson = gson.toJson(search);
+            return searchJson;
+        });
+
+
+        // add course route
+        put("/api/addToSchedule", (req, res) -> {
+            res.type("application/json");
+            try {
+                int userID = Integer.parseInt(req.queryParams("userID"));
+                int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+                int referenceNumber = Integer.parseInt(req.queryParams("referenceNumber"));
+
+                if (currentUser == null || currentUser.getUserID() != userID) {
+                    res.status(401);
+                    return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+                }
+
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+
+                Course course = data.GetCourseByRef(referenceNumber);
+                if (course == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Course not found\"}";
+                }
+
+                String conflict = schedule.addCourse(course);
+                if (conflict == null) {
+                    String scheduleJson = gson.toJson(schedule);
+                    String newCourseJson = gson.toJson(course);
+                    data.SaveSchedule(schedule);
+                    data.CloseConnection();
+                    return "{\"status\": \"success\", \"message\": \"Course added\", \"schedule\": " + scheduleJson + ", \"course\": " + newCourseJson + "}";
+                }
+                return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                res.status(400);
+                return "{\"status\": \"error\", \"message\": \"Invalid input format\"}";
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500);
+                return "{\"status\": \"error\", \"message\": \"Internal server error\"}";
+            }
+        });
+
+        // export schedule route
+        post("/api/exportSchedule", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+            String fileName = req.queryParams("fileName");
+
+            if (currentUser.getUserID() == userID) {
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+                String scheduleJson = gson.toJson(schedule);
+                schedule.exportSchedule(fileName);
+                return "{\"status\": \"success\", \"message\": \"Schedule exported\", \"schedule\": " + scheduleJson + "}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
         });
     }
 }

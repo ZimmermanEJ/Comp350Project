@@ -198,8 +198,10 @@ public class Main {
                     }
                 }
 
+                ArrayList<Integer> previousActions = new ArrayList<>();
                 // do whatever user wants to do with schedule
                 while (true) {
+                    System.out.println("\nCurrently viewing " + currentSchedule.getName());
                     System.out.println("\nCurrently viewing " + currentSchedule.getScheduleName());
 
                     System.out.print("Enter 'view' to view schedule, 'search' to search, 'export' to export calendar, or 'quit': ");
@@ -211,7 +213,7 @@ public class Main {
                     } else if (nextAction.equalsIgnoreCase("view")) { // view schedule
                         while (true) {
                             System.out.println(currentSchedule.scheduleView());
-                            System.out.print("Enter 'e' to add event, 'rc' to remove a course, 're' to remove an event, or 'quit': ");
+                            System.out.print("Enter 'e' to add event, 'rc' to remove a course, 're' to remove an event, 'undo' to undo last course-related action, or 'quit': ");
                             String next = scanner.nextLine();
 
                             if (next.equalsIgnoreCase("quit")) {
@@ -276,6 +278,7 @@ public class Main {
                                 try {
                                     int refNum = Integer.parseInt(course);
                                     if (currentSchedule.removeCourse(refNum)) {
+                                        previousActions.add(refNum);
                                         System.out.println("Course " + refNum + " removed");
                                     } else {
                                         System.out.println("Course not found");
@@ -295,6 +298,21 @@ public class Main {
                                     }
                                 } catch (Exception e) {
                                     System.out.println("Not a valid ID");
+                                }
+                            } else if (next.equalsIgnoreCase("undo")) {
+                                if (previousActions.isEmpty()) {
+                                    System.out.println("There are no previous course actions to undo");
+                                } else {
+                                    int refNum = previousActions.get(previousActions.size() - 1);
+                                    Course course = data.GetCourseByRef(refNum);
+                                    if (currentSchedule.getCourses().contains(refNum)) {
+                                        currentSchedule.removeCourse(refNum);
+                                        System.out.println("Removed course " + course.getTitle());
+                                    } else {
+                                        currentSchedule.addCourse(course);
+                                        System.out.println("Added course " + course.getTitle());
+                                    }
+                                    previousActions.remove(previousActions.size() - 1);
                                 }
                             } else {
                                 System.out.println("Input not recognized, try again");
@@ -391,7 +409,6 @@ public class Main {
                                 } else if (f1.equalsIgnoreCase("e")) {
                                     System.out.print("Enter end time filter: ");
                                     endTime = scanner.nextLine();
-
                                 }
                                 else if(f1.equalsIgnoreCase("none")) {
                                     //do nothing
@@ -455,6 +472,7 @@ public class Main {
                                                 courseFound = true;
                                                 String conflict = currentSchedule.addCourse(f.getFilteredResults().get(i));
                                                 if (conflict == null) {
+                                                    previousActions.add(refNum);
                                                     System.out.println("Course added to schedule!");
                                                 } else {
                                                     System.out.println("Course has a time conflict with course " + conflict);
