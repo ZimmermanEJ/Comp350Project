@@ -1,10 +1,15 @@
 package edu.gcc.comp350;
+
+import org.bson.types.ObjectId;
+import java.util.ArrayList;
+
 public class Course {
 
     public enum Days {
         MWF, TR
     }
 
+    private ObjectId _id; // MongoDB ObjectId
     private String department; // COMP
     private int courseNumber; // 350
     private char sectionCode; // A
@@ -14,16 +19,16 @@ public class Course {
     private String professor;
     private int referenceNumber;
     private Days days;
-    private boolean[] daysArray;
+    private ArrayList<Boolean> daysArray;
     private double startTime;
     private double endTime;
-    private double[][] timeSlot;
+    private ArrayList<ArrayList<Double>> timeSlot;
     private int courseID;
 
     public Course(String department, int courseNumber, char sectionCode,
                   String title, int credits, String description, String professor,
-                  int referenceNumber, Days days, double startTime, double endTime,
-                  double[][] timeSlot) {
+                  int referenceNumber, Days days, ArrayList<Boolean> daysArray, double startTime, double endTime,
+                  ArrayList<ArrayList<Double>> timeSlot) {
         this.department = department;
         this.courseNumber = courseNumber;
         this.sectionCode = sectionCode;
@@ -33,25 +38,18 @@ public class Course {
         this.professor = professor;
         this.referenceNumber = referenceNumber;
         this.days = days;
-        this.daysArray = new boolean[5];
+        this.daysArray = daysArray;
         this.startTime = startTime;
         this.endTime = endTime;
         this.timeSlot = timeSlot;
-        this.courseID = 1;
     }
 
     public boolean hasConflict(Course course) {
-        for (int i = 0; i < 7; i++) {
-            if(this.timeSlot[i].length > 1 && course.timeSlot[i].length > 1
-            && (this.timeSlot[i][0] != 0 && this.timeSlot[i][1] != 0)
-            && (course.timeSlot[i][0] != 0 && course.timeSlot[i][1] != 0)) {
-                if (this.timeSlot[i][0] == course.timeSlot[i][0] && this.timeSlot[i][1] == course.timeSlot[i][1]) {
-                    return true;
-                }
-                if (this.timeSlot[i][0] < course.timeSlot[i][0] && this.timeSlot[i][1] > course.timeSlot[i][0]) {
-                    return true;
-                }
-                if (this.timeSlot[i][0] > course.timeSlot[i][0] && this.timeSlot[i][0] < course.timeSlot[i][1]) {
+        for (int i = 0; i < timeSlot.size(); i++) {
+            ArrayList<Double> thisDay = this.timeSlot.get(i);
+            ArrayList<Double> otherDay = course.timeSlot.get(i);
+            if (thisDay.size() == 2 && otherDay.size() == 2) {
+                if (thisDay.get(0) < otherDay.get(1) && thisDay.get(1) > otherDay.get(0)) {
                     return true;
                 }
             }
@@ -91,7 +89,9 @@ public class Course {
         return referenceNumber;
     }
 
-    public Days getDays() { return days; }
+    public Days getDays() {
+        return days;
+    }
 
     public double getStartTime() {
         return startTime;
@@ -102,6 +102,15 @@ public class Course {
     }
 
     public double[][] getTimeSlot() {
+        double[][] timeSlotArray = new double[timeSlot.size()][];
+        for (int i = 0; i < timeSlot.size(); i++) {
+            ArrayList<Double> innerList = timeSlot.get(i);
+            timeSlotArray[i] = innerList.stream().mapToDouble(Double::doubleValue).toArray();
+        }
+        return timeSlotArray;
+    }
+
+    public ArrayList<ArrayList<Double>> getTimeSlotList() {
         return timeSlot;
     }
 
@@ -109,7 +118,21 @@ public class Course {
         return courseID;
     }
 
-    public String toString(){
-        return department + " " + courseNumber + sectionCode + " - " + title + " " + String.format("%.2f", ((startTime-1) % 12) + 1) + " - " + String.format("%.2f", ((endTime-1) % 12) + 1) + " " + days + " #" + referenceNumber;
+    public ArrayList<Boolean> getDaysArray() {
+        return daysArray;
+    }
+
+    public String toString() {
+        return department + " " + courseNumber + sectionCode + " - " + title + " " +
+                String.format("%.2f", ((startTime - 1) % 12) + 1) + " - " +
+                String.format("%.2f", ((endTime - 1) % 12) + 1) + " " + days + " #" + referenceNumber;
+    }
+
+    public ObjectId getId() {
+        return _id;
+    }
+
+    public void setId(ObjectId id) {
+        this._id = id;
     }
 }
