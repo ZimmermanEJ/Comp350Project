@@ -28,7 +28,7 @@ public class Main {
             // delete schedule
 
         User tempUser = new User("Temp", "a@a.com", "pw");
-        data.CreateNewUser(tempUser);
+//        data.CreateNewUser(tempUser);
 
         Scanner scanner = new Scanner(System.in);
 

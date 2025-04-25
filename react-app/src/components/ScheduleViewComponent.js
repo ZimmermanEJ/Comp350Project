@@ -89,7 +89,7 @@ function ScheduleViewComponent() {
       <>
         <div>
           <div>
-            <h1>{schedule.name} - {credits} credits</h1>
+            <h1>{schedule.scheduleName} - {credits} credits</h1>
             <button onClick={() => setExportModalOpen(true)} className="floating-button">Export</button>
           </div>
           <table>

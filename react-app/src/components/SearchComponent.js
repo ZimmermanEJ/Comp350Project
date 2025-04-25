@@ -59,6 +59,7 @@ function SearchComponent() {
                     timeRangeEnd: ''
                 });
                 setShowFilters(false);
+                console.log('Search results:', response.data.searchResults);
             } catch (error) {
                 console.error('Error fetching search results:', error);
             }

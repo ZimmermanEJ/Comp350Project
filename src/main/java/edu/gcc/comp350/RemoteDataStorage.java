@@ -146,7 +146,7 @@ public class RemoteDataStorage implements IDataConnection {
                 schedule.setScheduleID(0); // Assign the first schedule ID
             } else {
                 // Assign the next available schedule ID
-                int lastScheduleID = userSchedules.getLast().getScheduleID();
+                int lastScheduleID = userSchedules.get(userSchedules.size()-1).getScheduleID();
                 schedule.setScheduleID(lastScheduleID + 1);
             }
             schedules.insertOne(schedule); // Insert the schedule into the database
