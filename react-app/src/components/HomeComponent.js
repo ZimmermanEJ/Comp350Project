@@ -116,7 +116,7 @@ function HomeComponent() {
             {schedules.length > 0 ? schedules.map((schedule, index) => (
               <li key={index} className="card">
                 <span onClick={() => handleScheduleClick(schedule.scheduleID)}>
-                  {schedule.name}
+                  {schedule.scheduleName}
                 </span>
                 <button onClick={() => handleDeleteSchedule(schedule.scheduleID)}>X</button>
               </li>

@@ -1,21 +1,22 @@
 package edu.gcc.comp350;
+import org.bson.types.ObjectId;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Schedule {
 
+    private ObjectId _id;
     private int userID;
+    private String scheduleName;
     private int scheduleID;
-    private String name;
     private ArrayList<Integer> courses;
     private ArrayList<Integer> events;
 
     public Schedule(int userID, String name) {
         this.userID = userID;
-        this.name = name;
+        this.scheduleName = name;
         this.courses = new ArrayList<>();
         this.events = new ArrayList<>();
     }
@@ -90,12 +91,12 @@ public class Schedule {
         return scheduleID;
     }
 
-    public String getName() {
-        return name;
+    public String getScheduleName() {
+        return scheduleName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setScheduleName(String scheduleName) {
+        this.scheduleName = scheduleName;
     }
 
     public ArrayList<Integer> getCourses() {
@@ -107,7 +108,7 @@ public class Schedule {
     }
 
     public String scheduleView() {
-        StringBuilder toReturn = new StringBuilder(this.getName() + " - " + this.getTotalCredits() + " credits\n");
+        StringBuilder toReturn = new StringBuilder(this.getScheduleName() + " - " + this.getTotalCredits() + " credits\n");
         String[] dayList = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 //        for (int i = 1; i < 6; i++) { // monday through friday
@@ -183,7 +184,7 @@ public class Schedule {
         StringBuilder toReturn = new StringBuilder("ID: ");
 
         toReturn.append(this.getScheduleID()).append("\t");
-        toReturn.append("Name: ").append(this.getName());
+        toReturn.append("Name: ").append(this.getScheduleName());
         toReturn.append(" - ").append(this.getTotalCredits()).append(" credits");
 
         return toReturn.toString();
@@ -193,7 +194,7 @@ public class Schedule {
         PrintWriter pw = new PrintWriter(filename + ".ics");
         pw.println("BEGIN:VCALENDAR");
         pw.println("VERSION:2.0");
-        pw.println("PRODID:-//Grove City College//" + name + "//EN");
+        pw.println("PRODID:-//Grove City College//" + scheduleName + "//EN");
 
         for (Integer courseRef : this.getCourses()) {
             Course course = Main.data.GetCourseByRef(courseRef);
@@ -230,5 +231,18 @@ public class Schedule {
             case 5: return "FR";
             default: return "";
         }
+    }
+
+
+    public ObjectId getId() {
+        return _id;
+    }
+
+    public void setId(ObjectId id) {
+        this._id = id;
+    }
+
+    public String getName() {
+       return scheduleName;
     }
 }

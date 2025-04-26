@@ -1,15 +1,16 @@
 package edu.gcc.comp350;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
-    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+    static IDataConnection data = //new LocalDataStorage("courses.json", "users.json", "schedules.json");
+                                  new RemoteDataStorage();
 
     public static void main(String[] args) {
+
         run();
     }
     public static void run() {
@@ -27,7 +28,7 @@ public class Main {
             // delete schedule
 
         User tempUser = new User("Temp", "a@a.com", "pw");
-        data.CreateNewUser(tempUser);
+//        data.CreateNewUser(tempUser);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -201,6 +202,8 @@ public class Main {
                 // do whatever user wants to do with schedule
                 while (true) {
                     System.out.println("\nCurrently viewing " + currentSchedule.getName());
+                    System.out.println("\nCurrently viewing " + currentSchedule.getScheduleName());
+
                     System.out.print("Enter 'view' to view schedule, 'search' to search, 'export' to export calendar, or 'quit': ");
                     String nextAction = scanner.nextLine();
 
