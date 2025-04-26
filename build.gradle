@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 group = 'org.example'
@@ -23,9 +25,17 @@ dependencies {
     implementation 'com.sparkjava:spark-core:2.9.3'
     implementation 'org.slf4j:slf4j-api:1.7.32'    // Logging framework
     implementation 'org.slf4j:slf4j-simple:1.7.32' // Simple logger
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
 test {
     useJUnitPlatform()
 }
 
+//task runCurl(type: Exec) {
+//    def major = System.getProperty('major');
+//    def year = System.getProperty('year');
+//    def url = "http://localhost:4200/api/run-script?major=${major}&year=${year}"
+//
+//    commandLine 'curl', '-X', 'POST', url
+//}

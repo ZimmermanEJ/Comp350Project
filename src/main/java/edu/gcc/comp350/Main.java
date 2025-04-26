@@ -1,16 +1,21 @@
 package edu.gcc.comp350;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.lang.reflect.Array;
+import java.util.*;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.*;
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
     static IDataConnection data = //new LocalDataStorage("courses.json", "users.json", "schedules.json");
-                                  new RemoteDataStorage();
+            new RemoteDataStorage();
 
     public static void main(String[] args) {
-
         run();
     }
     public static void run() {
@@ -28,7 +33,7 @@ public class Main {
             // delete schedule
 
         User tempUser = new User("Temp", "a@a.com", "pw");
-//        data.CreateNewUser(tempUser);
+        data.CreateNewUser(tempUser);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -121,7 +126,7 @@ public class Main {
                 System.out.println("\nWelcome " + currentUser.getName() + "!");
 
                 // user opens a schedule
-                System.out.print("Enter the schedule id you would like to open, or 'show schedules', 'new', or 'delete' (or 'quit'): ");
+                System.out.print("Enter the schedule id you would like to open, or 'show schedules', 'new', 'auto-generate', 'delete', or 'quit': ");
                 scheduleInput = scanner.nextLine();
                 Schedule currentSchedule = null; // schedule to open
 
@@ -137,6 +142,44 @@ public class Main {
 
 
                     currentSchedule = mySchedule;
+                } else if (scheduleInput.equalsIgnoreCase("auto-generate")) { // sign out
+                    String major = currentUser.getMajor();
+                    int year = currentUser.getYear();
+                    if (major == null || year == 0) {
+                        System.out.println("Please set your major and year before using this feature");
+                    } else if (major.equals("Computer Science") && year >= 2026 || year <= 2029) {
+                        CurlExecutor curl = new CurlExecutor(major, String.valueOf(year));
+                        String output = null;
+                        try {
+                            output = curl.runCurlCommand();
+                        } catch (UnsupportedEncodingException e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
+                        if (output == null) {
+                            System.out.println("Error: No output from curl command");
+                            continue;
+                        } else {
+                            output = output.replaceAll("[\\[\\]\\s]", ""); // remove [ ] and spaces
+
+                            // Split the string into individual number strings
+                            String[] numberStrings = output.split(",");
+
+                            // Convert to int array
+                            int[] courseRefs = new int[numberStrings.length];
+                            for (int i = 0; i < numberStrings.length; i++) {
+                                courseRefs[i] = Integer.parseInt(numberStrings[i]);
+                            }
+
+                            currentSchedule = new Schedule(currentUser.getUserID(), "AI schedule");
+                            for (int ref : courseRefs) {
+                                Course course = data.GetCourseByRef(ref);
+                                currentSchedule.addCourse(course);
+                            }
+                        }
+                    } else {
+                        System.out.println("Auto-generate is not available for your major and/or year");
+                    }
+                    continue;
                 } else if (scheduleInput.equalsIgnoreCase("quit")) { // sign out
                     break;
                 } else if (scheduleInput.equalsIgnoreCase("show schedules")) {  // show schedules
@@ -202,8 +245,6 @@ public class Main {
                 // do whatever user wants to do with schedule
                 while (true) {
                     System.out.println("\nCurrently viewing " + currentSchedule.getName());
-                    System.out.println("\nCurrently viewing " + currentSchedule.getScheduleName());
-
                     System.out.print("Enter 'view' to view schedule, 'search' to search, 'export' to export calendar, or 'quit': ");
                     String nextAction = scanner.nextLine();
 
