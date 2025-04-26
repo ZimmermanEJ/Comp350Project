@@ -73,7 +73,7 @@ function ScheduleComponent() {
         <ul className="nav-list">
           <li className="nav-item" onClick={() => handleNavClick(`/home/${userID}`, { schedules })}>
             <div>
-              <Link to={`/home/${userID}`} state={{ schedules }}>Home</Link>
+              <Link to={`/home/${userID}`} state={{ schedules, userID }}>Home</Link>
             </div>
           </li>
           <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/view/`, { schedule, credits, schedules, courses })}>

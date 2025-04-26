@@ -187,6 +187,7 @@ public class Main2 {
         // logout route
         post("/api/logout", (req, res) -> {
             res.type("application/json");
+            data.CloseConnection();
             currentUser = null;
             schedules = null;
             return "{\"status\": \"success\", \"message\": \"Logged out\"}";
@@ -229,6 +230,19 @@ public class Main2 {
                 data.SaveSchedule(schedule);
                 data.CloseConnection();
                 return "{\"status\": \"success\", \"message\": \"Schedule saved\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        // get major year route
+        get("/api/getmajoryear", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            if (currentUser.getUserID() == userID) {
+                String major = currentUser.getMajor();
+                int year = currentUser.getYear();
+                return "{\"status\": \"success\", \"message\": \"Major and year retrieved\", \"major\": \"" + major + "\", \"year\": " + year + "}";
             }
             res.status(401);
             return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";

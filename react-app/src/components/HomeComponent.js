@@ -52,7 +52,25 @@ function HomeComponent() {
     }
   };
 
-  const handleCreateSchedule = async (name) => {
+  const handleLogout = async () => {
+    try {
+        await axios.post('http://localhost:4567/api/logout');
+        navigate('/');
+    } catch (error) {
+        console.error('Logout failed:', error.response?.data.message);
+    }
+  }
+
+  const handleCreateSchedule = async (name, useAI, major, year) => {
+    if (year !== 0 || major !== "") {
+        try {
+            const response = await axios.put('http://localhost:4567/api/setmajoryear', null, {
+              params: { user: user.userID, major, year }
+            });
+        } catch (error) {
+            console.error('Error saving major and year:', error.response?.data.message);
+        }
+    }
     try {
       const response = await axios.post('http://localhost:4567/api/schedule', null, {
         params: { userID, name }
@@ -91,6 +109,7 @@ function HomeComponent() {
   return (
     <div className="container">
       <h1>Welcome {user ? user.name : 'User'}!</h1>
+      <button className="logout-button" onClick={() => handleLogout(`/`, {})}>Logout</button>
       <div className="schedules-container">
         <div className="schedules-list">
           <ul>

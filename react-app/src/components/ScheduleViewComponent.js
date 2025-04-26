@@ -71,7 +71,7 @@ function ScheduleViewComponent() {
                 alert(response.data.course.title + " added to schedule.");
             }
 
-            if (response.data.isLast == true) {
+            if (response.data.isLast === true) {
                 setCanUndo(false);
             }
             fetchSchedule(schedule.scheduleID);
@@ -122,7 +122,7 @@ function ScheduleViewComponent() {
             <h1>{schedule.name} - {credits} credits</h1>
             <button onClick={() => setExportModalOpen(true)} className="floating-button">Export</button>
           </div>
-          <table>
+          <table className='schedule-table'>
             <thead>
               <tr>
                 <th></th>

@@ -1,8 +1,8 @@
 /* ScheduleView.css */
-table {
-  width: 100%;
+.schedule-table {
+  width: 80%;
   border-collapse: collapse;
-  margin: 20px 0;
+  margin: 20px auto; /* Center the table horizontally */
   font-size: 1em;
   font-family: 'Arial', sans-serif;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
@@ -32,9 +32,11 @@ tr:hover {
 .course-cell {
   background-color: #e0f7fa;
   border-radius: 4px;
-  padding: 5px;
+  padding: 10px;
+  padding-top: 30px;
   margin: 2px 0;
   position: relative;
+  font-size: 0.8em;
 }
 
 .drop-button {
@@ -46,7 +48,7 @@ tr:hover {
   cursor: pointer;
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
 }
 
 .drop-button:hover {
@@ -84,7 +86,7 @@ tr:hover {
   background-color: #f8f9fa;
   border: 1px solid #0056b3;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 20px;
   cursor: pointer;
   color: #0056b3;
   z-index: 1001; /* Ensure it appears above other elements */
