@@ -20,8 +20,9 @@ function CreateScheduleModal({ isOpen, onClose, onCreate }) {
   },[]);
 
   const handleCreate = () => {
-    onCreate(scheduleName, useAI);
+    onCreate(scheduleName, useAI, showFields, major, year);
     setScheduleName('');
+    setUseAI(false);
     onClose();
   };
 
@@ -71,7 +72,7 @@ function CreateScheduleModal({ isOpen, onClose, onCreate }) {
                 className="dropdown"
                 id="year"
                 value={year}
-                onChange={(e) => setYear(e.target.value)}
+                onChange={(e) => setYear(parseInt(e.target.value))}
               >
                 <option value="">--Select Graduation Year--</option>
                 <option value="2026">2026</option>

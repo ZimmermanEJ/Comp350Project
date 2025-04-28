@@ -3,6 +3,7 @@ package edu.gcc.comp350;
 import java.util.ArrayList;
 
 import com.mongodb.*;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -97,6 +98,24 @@ public class RemoteDataStorage implements IDataConnection {
     }
 
     @Override
+    public User SaveUser(User user) {
+        try {
+            User existingUser = users.find(eq("email", user.getEmail())).first();
+            if (existingUser != null) {
+                // Update the existing user
+                users.replaceOne(eq("email", user.getEmail()), user);
+            } else {
+                InsertOneResult res = users.insertOne(user);
+                user = users.find(eq("_id",res.getInsertedId())).first();
+            }
+            return user;
+        } catch (MongoException e) {
+            System.err.println("Error saving user: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public User GetUserByName(String name) {
         try {
             return users.find(eq("name", name)).first();
@@ -118,6 +137,7 @@ public class RemoteDataStorage implements IDataConnection {
 
     @Override
     public User CreateNewUser(User user) {
+
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
@@ -127,6 +147,7 @@ public class RemoteDataStorage implements IDataConnection {
 
         if (GetUserByEmail(user.getEmail()) == null) {
             try {
+                user.setUserID(users.find().sort(Sorts.descending("userID")).limit(1).first().getUserID() + 1);
                 users.insertOne(user);
                 return GetUserByEmail(user.getEmail());
             } catch (MongoException e) {
@@ -146,7 +167,7 @@ public class RemoteDataStorage implements IDataConnection {
                 schedule.setScheduleID(0); // Assign the first schedule ID
             } else {
                 // Assign the next available schedule ID
-                int lastScheduleID = userSchedules.get(userSchedules.size()-1).getScheduleID();
+                int lastScheduleID = schedules.find(eq("userID", schedule.getUserID())).sort(Sorts.descending("scheduleID")).limit(1).first().getScheduleID();
                 schedule.setScheduleID(lastScheduleID + 1);
             }
             schedules.insertOne(schedule); // Insert the schedule into the database

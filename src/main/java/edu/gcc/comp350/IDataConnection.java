@@ -18,6 +18,8 @@ public interface IDataConnection {
 
     public User CreateNewUser(User user);
 
+    public User SaveUser(User user);
+
     public Schedule CreateNewSchedule(Schedule schedule);
 
     public Course GetCourseByName(String name);

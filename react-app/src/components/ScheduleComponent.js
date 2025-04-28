@@ -54,7 +54,7 @@ function ScheduleComponent() {
 
   const handleSaveSchedule = async () => {
     try {
-        const response = await axios.post('http://localhost:4567/api/undo', null, {
+        const response = await axios.post('http://localhost:4567/api/saveschedule', null, {
           params: { userID, scheduleID }
         });
         if (response.data.status === 'success') {

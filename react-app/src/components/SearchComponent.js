@@ -214,15 +214,9 @@ function SearchComponent() {
               params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
             });
             if (response.data.status === 'success') {
-                if (response.data.message === 'Course removed') {
-                    alert(response.data.course.title + " removed from schedule.");
-                } else if (response.data.message === 'Course added') {
-                    alert(response.data.course.title + " added to schedule.");
-                }
-
-                if (response.data.isLast == true) {
+//                if (response.data.isLast == true) {
                     setCanUndo(false);
-                }
+//                }
             } else if (response.data.status === 'error') {
                 alert(response.data.message);
             }
@@ -234,9 +228,7 @@ function SearchComponent() {
     return (
 
         <div>
-            {canUndo && (
-                <button className="undo-button" onClick={handleUndo}>Undo</button>
-            )}
+
             <input
                 className="search-input"
                 type="text"

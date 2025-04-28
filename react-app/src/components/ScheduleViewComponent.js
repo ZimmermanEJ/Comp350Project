@@ -48,7 +48,6 @@ function ScheduleViewComponent() {
         setCredits(credits - course.credits);
         setSchedule(response.data.schedule);
         setCanUndo(true);
-        alert(course.title + " has been dropped from your schedule.");
       }
     } catch (error) {
       if (error.response != null) {
@@ -65,18 +64,13 @@ function ScheduleViewComponent() {
           params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
         });
         if (response.data.status === 'success') {
-            if (response.data.message === 'Course removed') {
-                alert(response.data.course.title + " removed from schedule.");
-            } else if (response.data.message === 'Course added') {
-                alert(response.data.course.title + " added to schedule.");
-            }
 
-            if (response.data.isLast === true) {
+            // uncomment this if allow multiple undos
+//            if (response.data.isLast === true) {
                 setCanUndo(false);
-            }
+//            }
             fetchSchedule(schedule.scheduleID);
         } else if (response.data.status === 'error') {
-            alert(response.data.message);
         }
       } catch (error) {
         console.error(error.response?.data.message);

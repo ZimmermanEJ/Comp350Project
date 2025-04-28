@@ -136,6 +136,23 @@ public class LocalDataStorage implements IDataConnection {
     }
 
     /**
+     * Saves a user.
+     * @param user The user to save.
+     * @return The saved user.
+     */
+    @Override
+    public User SaveUser(User user){
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserID() == user.getUserID()) {
+                users.set(i, user);
+                return user;
+            }
+        }
+        users.add(user);
+        return user;
+    }
+
+    /**
      * Retrieves a user by their name.
      * @param name The name of the user.
      * @return The user with the given name, or null if not found.

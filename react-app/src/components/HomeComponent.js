@@ -13,6 +13,7 @@ function HomeComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    console.log(user?.userID);
     const fetchSchedules = async () => {
       try {
         const response = await axios.get('http://localhost:4567/api/schedules', {
@@ -61,19 +62,21 @@ function HomeComponent() {
     }
   }
 
-  const handleCreateSchedule = async (name, useAI, major, year) => {
-    if (year !== 0 || major !== "") {
+  const handleCreateSchedule = async (name, useAI, showFields, major, year) => {
+    if (useAI && showFields) {
         try {
             const response = await axios.put('http://localhost:4567/api/setmajoryear', null, {
-              params: { user: user.userID, major, year }
+              params: { userID: user.userID, major, year }
             });
+            console.log(user.major, user.year);
         } catch (error) {
             console.error('Error saving major and year:', error.response?.data.message);
         }
     }
     try {
+      console.log('test', userID);
       const response = await axios.post('http://localhost:4567/api/schedule', null, {
-        params: { userID, name }
+        params: { userID, name, useAI, major, year }
       });
       if (response.data.status === 'success') {
         setSchedules([...schedules, response.data.schedule]);
