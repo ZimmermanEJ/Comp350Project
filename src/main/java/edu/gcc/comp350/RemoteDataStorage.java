@@ -3,6 +3,7 @@ package edu.gcc.comp350;
 import java.util.ArrayList;
 
 import com.mongodb.*;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -127,6 +128,7 @@ public class RemoteDataStorage implements IDataConnection {
 
         if (GetUserByEmail(user.getEmail()) == null) {
             try {
+                user.setUserID(users.find().sort(Sorts.descending("userID")).limit(1).first().getUserID() + 1); // Assign the next available user ID
                 users.insertOne(user);
                 return GetUserByEmail(user.getEmail());
             } catch (MongoException e) {
@@ -146,7 +148,7 @@ public class RemoteDataStorage implements IDataConnection {
                 schedule.setScheduleID(0); // Assign the first schedule ID
             } else {
                 // Assign the next available schedule ID
-                int lastScheduleID = userSchedules.get(userSchedules.size()-1).getScheduleID();
+                int lastScheduleID = schedules.find(eq("userID", schedule.getUserID())).sort(Sorts.descending("scheduleID")).limit(1).first().getScheduleID();
                 schedule.setScheduleID(lastScheduleID + 1);
             }
             schedules.insertOne(schedule); // Insert the schedule into the database
