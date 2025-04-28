@@ -147,7 +147,9 @@ public class RemoteDataStorage implements IDataConnection {
 
         if (GetUserByEmail(user.getEmail()) == null) {
             try {
+
                 user.setUserID(users.find().sort(Sorts.descending("userID")).limit(1).first().getUserID() + 1);
+
                 users.insertOne(user);
                 return GetUserByEmail(user.getEmail());
             } catch (MongoException e) {
