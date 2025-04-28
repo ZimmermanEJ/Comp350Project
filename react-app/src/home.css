@@ -92,7 +92,7 @@ button:hover {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
+  width: 350px;
   text-align: center;
 }
 
@@ -144,4 +144,30 @@ button:hover {
 
 .schedules-list {
   flex: 1;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between the checkbox and the text */
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+  padding-bottom: 10px;
+}
+
+.logout-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #0056b3;
+  border-radius: 5px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #0056b3;
+  z-index: 1001; /* Ensure it appears above other elements */
+}
+
+.logout-button:hover {
+  background-color: #e2e6ea;
 }

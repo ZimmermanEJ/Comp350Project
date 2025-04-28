@@ -41,7 +41,7 @@
 }
 
 /* Search box styling */
-input[type="text"] {
+.search-input {
   width: 40%;
   padding: 10px;
   font-size: 16px;
@@ -63,7 +63,7 @@ input[type="text"] {
 button.filter-button {
   display: block;
   margin: 10px auto;
-  background-color: #dc3545;
+  background-color: #007bff;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -75,7 +75,7 @@ button.filter-button {
 }
 
 button.filter-button:hover {
-  background-color: #c82333;
+  background-color: #0056b3;
 }
 
 /* Button container styling */

@@ -13,6 +13,7 @@ function HomeComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    console.log(user?.userID);
     const fetchSchedules = async () => {
       try {
         const response = await axios.get('http://localhost:4567/api/schedules', {
@@ -52,10 +53,30 @@ function HomeComponent() {
     }
   };
 
-  const handleCreateSchedule = async (name) => {
+  const handleLogout = async () => {
     try {
+        await axios.post('http://localhost:4567/api/logout');
+        navigate('/');
+    } catch (error) {
+        console.error('Logout failed:', error.response?.data.message);
+    }
+  }
+
+  const handleCreateSchedule = async (name, useAI, showFields, major, year) => {
+    if (useAI && showFields) {
+        try {
+            const response = await axios.put('http://localhost:4567/api/setmajoryear', null, {
+              params: { userID: user.userID, major, year }
+            });
+            console.log(user.major, user.year);
+        } catch (error) {
+            console.error('Error saving major and year:', error.response?.data.message);
+        }
+    }
+    try {
+      console.log('test', userID);
       const response = await axios.post('http://localhost:4567/api/schedule', null, {
-        params: { userID, name }
+        params: { userID, name, useAI, major, year }
       });
       if (response.data.status === 'success') {
         setSchedules([...schedules, response.data.schedule]);
@@ -81,6 +102,7 @@ function HomeComponent() {
       });
       if (response.data.status === 'success') {
         setSchedules(schedules.filter(schedule => schedule.scheduleID !== scheduleID));
+        alert("Schedule has been deleted.");
       }
     } catch (error) {
       console.error(error.response?.data.message);
@@ -90,6 +112,7 @@ function HomeComponent() {
   return (
     <div className="container">
       <h1>Welcome {user ? user.name : 'User'}!</h1>
+      <button className="logout-button" onClick={() => handleLogout(`/`, {})}>Logout</button>
       <div className="schedules-container">
         <div className="schedules-list">
           <ul>

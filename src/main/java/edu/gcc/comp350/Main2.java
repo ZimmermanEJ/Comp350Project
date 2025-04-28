@@ -1,5 +1,6 @@
 package edu.gcc.comp350;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -11,10 +12,11 @@ import static spark.Spark.*;
 public class Main2 {
 
     static IDataConnection data = new RemoteDataStorage();
-//    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+    // static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
     static User currentUser;
     static ArrayList<Schedule> schedules;
     static Gson gson = new Gson();
+    static ArrayList<Integer> previousActions;
 
     public static void main(String[] args) {
         // Allow requests from any origin (you can restrict this later to a specific origin)
@@ -55,15 +57,17 @@ public class Main2 {
             String email = req.queryParams("email");
             String password = req.queryParams("password");
 
-            currentUser = data.GetUserByEmail(email);
-            if (currentUser == null) {
+            User tempUser = data.GetUserByEmail(email);
+            previousActions = new ArrayList<>();
+            if (tempUser == null) {
                 res.status(401);
                 return "{\"status\": \"error\", \"message\": \"Invalid email\"}";
-            } else if (!Arrays.equals(currentUser.getPasswordHash(), currentUser.hash(password))) {
+            } else if (!Arrays.equals(tempUser.getPasswordHash(), tempUser.hash(password))) {
                 res.status(401);
                 return "{\"status\": \"error\", \"message\": \"Invalid password\"}";
             }
             else {
+                currentUser = tempUser;
                 schedules = data.GetUserIdSchedules(currentUser.getUserID());
                 String userJson = gson.toJson(currentUser);
                 String schedulesJson = gson.toJson(schedules);
@@ -105,6 +109,7 @@ public class Main2 {
                     courses.add(course);
                 }
                 String coursesJson = gson.toJson(courses);
+                previousActions = new ArrayList<>();
                 return "{\"status\": \"success\", \"message\": \"Schedule opened\", \"schedule\": " + scheduleJson + ", \"courses\": " + coursesJson + ", \"credits\": " + schedule.getTotalCredits() + "}";
             }
             res.status(401);
@@ -116,14 +121,47 @@ public class Main2 {
             res.type("application/json");
             int userID = Integer.parseInt(req.queryParams("userID"));
             String name = req.queryParams("name");
+            boolean useAI = Boolean.parseBoolean(req.queryParams("useAI"));
+            String major = req.queryParams("major");
+            int year = Integer.parseInt(req.queryParams("year"));
 
+            Schedule schedule;
             if (currentUser.getUserID() == userID) {
-                Schedule schedule = new Schedule(userID, name);
+                if (useAI) {
+                    CurlExecutor curl = new CurlExecutor(major, String.valueOf(year));
+                    String output = null;
+                    try {
+                        output = curl.runCurlCommand();
+                    } catch (UnsupportedEncodingException e) {
+                    }
+
+                    output = output.replaceAll("[\\[\\]\\s]", ""); // remove [ ] and spaces
+
+                    // Split the string into individual number strings
+                    String[] numberStrings = output.split(",");
+
+                    // Convert to int array
+                    int[] courseRefs = new int[numberStrings.length];
+                    for (int i = 0; i < numberStrings.length; i++) {
+                        courseRefs[i] = Integer.parseInt(numberStrings[i]);
+                    }
+
+                    schedule = new Schedule(currentUser.getUserID(), name);
+                    for (int ref : courseRefs) {
+                        Course course = data.GetCourseByRef(ref);
+                        schedule.addCourse(course);
+                    }
+
+                } else {
+                    schedule = new Schedule(userID, name);
+                }
+
+
                 schedule = data.CreateNewSchedule(schedule);
                 String scheduleJson = gson.toJson(schedule);
                 data.SaveSchedule(schedule);
-//                data.CloseConnection();
-
+                // data.CloseConnection();
+                previousActions = new ArrayList<>();
                 res.status(200);
                 return "{\"status\": \"success\", \"message\": \"Schedule created\", \"schedule\": " + scheduleJson + "}";
             }
@@ -145,7 +183,7 @@ public class Main2 {
                 }
                 boolean del = data.DeleteSchedule(schedule);
                 if (del) {
-//                    data.CloseConnection();
+                    // data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Schedule deleted\"}";
                 }
                 res.status(404);
@@ -170,8 +208,10 @@ public class Main2 {
                 }
                 boolean rem = schedule.removeCourse(referenceNumber);
                 if (rem) {
+                    previousActions.add(referenceNumber);
                     String scheduleJson = gson.toJson(schedule);
                     data.SaveSchedule(schedule);
+                    // data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Course removed\", \"schedule\": " + scheduleJson + "}";
                 }
                 res.status(404);
@@ -184,6 +224,7 @@ public class Main2 {
         // logout route
         post("/api/logout", (req, res) -> {
             res.type("application/json");
+            // data.CloseConnection();
             currentUser = null;
             schedules = null;
             return "{\"status\": \"success\", \"message\": \"Logged out\"}";
@@ -202,9 +243,11 @@ public class Main2 {
             }
 
             User newUser = new User(name, email, password);
-            data.CreateNewUser(newUser);
-//            data.CloseConnection();
+            newUser = data.CreateNewUser(newUser);
+            schedules = new ArrayList<>();
+            // data.CloseConnection();
             currentUser = newUser;
+            previousActions = new ArrayList<>();
             String userJson = gson.toJson(currentUser);
             String schedulesJson = gson.toJson(schedules);
             return "{\"status\": \"success\", \"message\": \"Login successful\", \"user\": " + userJson + ", \"schedules\": " + schedulesJson + "}";
@@ -223,8 +266,23 @@ public class Main2 {
                     return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
                 }
                 data.SaveSchedule(schedule);
-//                data.CloseConnection();
+                // data.CloseConnection();
                 return "{\"status\": \"success\", \"message\": \"Schedule saved\"}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        // get major year route
+        get("/api/getmajoryear", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+
+             if (currentUser.getUserID() == userID) {
+                User user = data.GetUserByEmail(currentUser.getEmail());
+                String major = user.getMajor();
+                int year = user.getYear();
+                return "{\"status\": \"success\", \"message\": \"Major and year retrieved\", \"major\": \"" + major + "\", \"year\": " + year + "}";
             }
             res.status(401);
             return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
@@ -242,7 +300,8 @@ public class Main2 {
                     User user = data.GetUserByEmail(currentUser.getEmail());
                     user.setMajor(major);
                     user.setYear(year);
-//                    data.CloseConnection();
+                    data.SaveUser(user);
+                    // data.CloseConnection();
                 } catch (Exception e) {
                     res.status(501);
                     return "{\"status\": \"error\", \"message\": " + e.getMessage() + "}";
@@ -293,7 +352,7 @@ public class Main2 {
                 int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
                 int referenceNumber = Integer.parseInt(req.queryParams("referenceNumber"));
 
-                if (currentUser == null || currentUser.getUserID() != userID) {
+                if (currentUser == null) {
                     res.status(401);
                     return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
                 }
@@ -312,10 +371,11 @@ public class Main2 {
 
                 String conflict = schedule.addCourse(course);
                 if (conflict == null) {
+                    previousActions.add(course.getReferenceNumber());
                     String scheduleJson = gson.toJson(schedule);
                     String newCourseJson = gson.toJson(course);
                     data.SaveSchedule(schedule);
-//                    data.CloseConnection();
+                    // data.CloseConnection();
                     return "{\"status\": \"success\", \"message\": \"Course added\", \"schedule\": " + scheduleJson + ", \"course\": " + newCourseJson + "}";
                 }
                 return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
@@ -346,6 +406,62 @@ public class Main2 {
                 String scheduleJson = gson.toJson(schedule);
                 schedule.exportSchedule(fileName);
                 return "{\"status\": \"success\", \"message\": \"Schedule exported\", \"schedule\": " + scheduleJson + "}";
+            }
+            res.status(401);
+            return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";
+        });
+
+        // undo course-related action
+        put("/api/undo", (req, res) -> {
+            res.type("application/json");
+            int userID = Integer.parseInt(req.queryParams("userID"));
+            int scheduleID = Integer.parseInt(req.queryParams("scheduleID"));
+
+            if (currentUser.getUserID() == userID) {
+                Schedule schedule = data.GetScheduleId(userID, scheduleID);
+                if (schedule == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Schedule not found\"}";
+                }
+
+                if (previousActions.isEmpty()) {
+                    return "{\"status\": \"error\", \"message\": \"No actions to undo\"}";
+                }
+                int refNum = previousActions.get(previousActions.size() - 1);
+                Course course = data.GetCourseByRef(refNum);
+                if (course == null) {
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Course not found\"}";
+                }
+
+                if (schedule.getCourses().contains(refNum)) {
+                    boolean rem = schedule.removeCourse(course.getReferenceNumber());
+                    if (rem) {
+                        String scheduleJson = gson.toJson(schedule);
+                        String courseJson = gson.toJson(course);
+                        previousActions.remove(previousActions.size() - 1);
+                        boolean isLastAction = previousActions.isEmpty();
+                        // data.CloseConnection();
+                        return "{\"status\": \"success\", \"message\": \"Course removed\", \"schedule\": " + scheduleJson + ", \"course\": " + courseJson + ", \"isLast\": " + isLastAction + "}";
+                    }
+                    res.status(404);
+                    return "{\"status\": \"error\", \"message\": \"Course not found\"}";
+                } else {
+                    String conflict = schedule.addCourse(course);
+                    if (conflict == null) {
+                        String scheduleJson = gson.toJson(schedule);
+                        String newCourseJson = gson.toJson(course);
+                        data.SaveSchedule(schedule);
+                        // data.CloseConnection();
+                        previousActions.remove(previousActions.size() - 1);
+                        boolean isLastAction = previousActions.isEmpty();
+                        return "{\"status\": \"success\", \"message\": \"Course added\", \"schedule\": " + scheduleJson + ", \"course\": " + newCourseJson + ", \"isLast\": " + isLastAction + "}";
+                    }
+                    // there is conflict
+                    res.status(409);
+                    return "{\"status\": \"error\", \"message\": \"Course conflict with " + conflict + "\"}";
+                }
+
             }
             res.status(401);
             return "{\"status\": \"error\", \"message\": \"Unauthorized\"}";

@@ -12,22 +12,24 @@ function ScheduleViewComponent() {
   const initialCourses = location.state?.courses;
   const [courses, setCourses] = useState(initialCourses);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+
+  const fetchSchedule = async (scheduleID) => {
+      try {
+        const response = await axios.get('http://localhost:4567/api/schedule', {
+          params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
+        });
+        if (response.data.status === 'success') {
+          setCredits(response.data.credits)
+          setCourses(response.data.courses);
+          setSchedule(response.data.schedule);
+        }
+      } catch (error) {
+        console.error(error.response?.data.message);
+      }
+  };
 
   useEffect(() => {
-      const fetchSchedule = async (scheduleID) => {
-        try {
-          const response = await axios.get('http://localhost:4567/api/schedule', {
-            params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
-          });
-          if (response.data.status === 'success') {
-            setCredits(response.data.credits)
-            setCourses(response.data.courses);
-            setSchedule(response.data.schedule);
-          }
-        } catch (error) {
-          console.error(error.response?.data.message);
-        }
-      };
       fetchSchedule();
   }, [schedule.scheduleID]);
 
@@ -45,7 +47,7 @@ function ScheduleViewComponent() {
         setCourses(courses.filter(course => course.referenceNumber !== referenceNumber));
         setCredits(credits - course.credits);
         setSchedule(response.data.schedule);
-        alert(course.title + " has been dropped from your schedule.");
+        setCanUndo(true);
       }
     } catch (error) {
       if (error.response != null) {
@@ -55,6 +57,25 @@ function ScheduleViewComponent() {
       }
     }
   };
+
+  const handleUndo = async () => {
+      try {
+        const response = await axios.put('http://localhost:4567/api/undo', null, {
+          params: { userID: schedule.userID, scheduleID: schedule.scheduleID }
+        });
+        if (response.data.status === 'success') {
+
+            // uncomment this if allow multiple undos
+//            if (response.data.isLast === true) {
+                setCanUndo(false);
+//            }
+            fetchSchedule(schedule.scheduleID);
+        } else if (response.data.status === 'error') {
+        }
+      } catch (error) {
+        console.error(error.response?.data.message);
+      }
+  }
 
   const handleExportSchedule = async (name) => {
       try {
@@ -89,10 +110,13 @@ function ScheduleViewComponent() {
       <>
         <div>
           <div>
+            {canUndo && (
+                <button className="undo-button" onClick={handleUndo}>Undo</button>
+            )}
             <h1>{schedule.scheduleName} - {credits} credits</h1>
             <button onClick={() => setExportModalOpen(true)} className="floating-button">Export</button>
           </div>
-          <table>
+          <table className='schedule-table'>
             <thead>
               <tr>
                 <th></th>

@@ -9,37 +9,41 @@ function StatusSheetComponent() {
   const [image, setImage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const [major, setMajor] = useState(""); // State for selected major
-  const [year, setYear] = useState(""); // State for selected year
+  const [year, setYear] = useState(0); // State for selected year
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchMajorYear = async () => {
       try {
-        const response = await axios.get('http://localhost:4567/api/user', {
+        const response = await axios.get('http://localhost:4567/api/getmajoryear', {
           params: { userID }
         });
         if (response.data.status === 'success') {
-          setUser(response.data.user);
-          if (response.data.user.year !== 0 && response.data.user.major) {
-            setIsModalOpen(false);
-            setImage(`/images/${response.data.user.major}${response.data.user.year}.png`);
-          } else {
-            setIsModalOpen(true);
-            setImage("/images/gcc.jpg");
-          }
+          setMajor(response.data.major);
+          setYear(response.data.year);
         } else {
           console.error('Failed to fetch user:', response.data.message);
         }
-     } catch (error) {
+      } catch (error) {
         console.error('Error fetching user:', error.message);
-     }
+      }
     };
 
     if (userID) {
-      fetchUser();
+      fetchMajorYear();
     } else {
       console.error('Invalid userID');
     }
   }, [userID]);
+
+  useEffect(() => {
+    if (year !== 0 && major !== "") {
+      setIsModalOpen(false);
+      setImage(`/images/${major}${year}.png`);
+    } else {
+      setIsModalOpen(true);
+      setImage("/images/gcc.jpg");
+    }
+  }, [major, year]);
 
   const handleSave = async () => {
     if (major && year) {
@@ -67,6 +71,7 @@ function StatusSheetComponent() {
             <div>
               <label htmlFor="major">Major: </label>
               <select
+                className="dropdown"
                 id="major"
                 value={major}
                 onChange={(e) => setMajor(e.target.value)}
@@ -78,6 +83,7 @@ function StatusSheetComponent() {
             <div>
               <label htmlFor="year">Year: </label>
               <select
+                className="dropdown"
                 id="year"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
@@ -89,7 +95,7 @@ function StatusSheetComponent() {
                 <option value="2029">2029</option>
               </select>
             </div>
-            <button onClick={handleSave}>Save</button>
+            <button className='create-button' onClick={handleSave}>Save</button>
           </div>
         </div>
       )}

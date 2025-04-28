@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-    static IDataConnection data = //new LocalDataStorage("courses.json", "users.json", "schedules.json");
-            new RemoteDataStorage();
+    static IDataConnection data = new LocalDataStorage("courses.json", "users.json", "schedules.json");
+            //new RemoteDataStorage();
 
     public static void main(String[] args) {
         run();
@@ -145,7 +145,7 @@ public class Main {
                 } else if (scheduleInput.equalsIgnoreCase("auto-generate")) { // sign out
                     String major = currentUser.getMajor();
                     int year = currentUser.getYear();
-                    if (major == null || year == 0) {
+                    if (major.isEmpty() || year == 0) {
                         System.out.println("Please set your major and year before using this feature");
                     } else if (major.equals("Computer Science") && year >= 2026 || year <= 2029) {
                         CurlExecutor curl = new CurlExecutor(major, String.valueOf(year));
@@ -175,6 +175,8 @@ public class Main {
                                 Course course = data.GetCourseByRef(ref);
                                 currentSchedule.addCourse(course);
                             }
+                            data.SaveSchedule(currentSchedule);
+                            System.out.println(currentSchedule.scheduleView());
                         }
                     } else {
                         System.out.println("Auto-generate is not available for your major and/or year");

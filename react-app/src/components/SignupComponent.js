@@ -20,11 +20,11 @@ function SignupComponent() {
           name: name
         }
       });
-      if (response.data.status === 'success') {
+      if (response.data?.status === 'success') {
         navigate(`/home/${response.data.user.userID}`, { state: { user: response.data.user, schedules: response.data.schedules } });
       }
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response?.data?.message);
     }
   };
 

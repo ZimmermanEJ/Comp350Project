@@ -98,6 +98,24 @@ public class RemoteDataStorage implements IDataConnection {
     }
 
     @Override
+    public User SaveUser(User user) {
+        try {
+            User existingUser = users.find(eq("email", user.getEmail())).first();
+            if (existingUser != null) {
+                // Update the existing user
+                users.replaceOne(eq("email", user.getEmail()), user);
+            } else {
+                InsertOneResult res = users.insertOne(user);
+                user = users.find(eq("_id",res.getInsertedId())).first();
+            }
+            return user;
+        } catch (MongoException e) {
+            System.err.println("Error saving user: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public User GetUserByName(String name) {
         try {
             return users.find(eq("name", name)).first();
@@ -119,6 +137,7 @@ public class RemoteDataStorage implements IDataConnection {
 
     @Override
     public User CreateNewUser(User user) {
+
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
@@ -128,7 +147,9 @@ public class RemoteDataStorage implements IDataConnection {
 
         if (GetUserByEmail(user.getEmail()) == null) {
             try {
-                user.setUserID(users.find().sort(Sorts.descending("userID")).limit(1).first().getUserID() + 1); // Assign the next available user ID
+
+                user.setUserID(users.find().sort(Sorts.descending("userID")).limit(1).first().getUserID() + 1);
+
                 users.insertOne(user);
                 return GetUserByEmail(user.getEmail());
             } catch (MongoException e) {
