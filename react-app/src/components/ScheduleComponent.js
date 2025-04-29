@@ -10,6 +10,7 @@ function ScheduleComponent() {
   const { userID, scheduleID } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const user = location.state?.user;
   const [schedule, setSchedule] = useState([]);
   const [credits, setCredits] = useState(location.state?.credits);
   const schedules = location.state?.schedules;
@@ -47,6 +48,7 @@ function ScheduleComponent() {
         }
       } else if (path === `/home/${userID}`) {
         handleSaveSchedule();
+        navigate(path, { state });
       } else {
         navigate(path, { state });
       }
@@ -73,25 +75,25 @@ function ScheduleComponent() {
         <ul className="nav-list">
           <li className="nav-item" onClick={() => handleNavClick(`/home/${userID}`, { schedules })}>
             <div>
-              <Link to={`/home/${userID}`} state={{ schedules, userID }}>Home</Link>
+              <Link to={`/home/${userID}`} state={{ schedules, userID, user }}>Home</Link>
             </div>
           </li>
           <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/view/`, { schedule, credits, schedules, courses })}>
             <div>
               <NavLink
                 to={`/schedule/${userID}/${scheduleID}/view`}
-                state={{ schedule, credits, schedules }}
+                state={{ schedule, credits, schedules, user }}
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
                 Schedule View
               </NavLink>
             </div>
           </li>
-          <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/search/`, { schedule, credits, schedules, courses })}>
+          <li className="nav-item" onClick={() => handleNavClick(`/schedule/${userID}/${scheduleID}/search/`, { schedule, credits, schedules, courses, user })}>
             <div>
               <NavLink
                 to={`/schedule/${userID}/${scheduleID}/search/`}
-                state={{ schedule, credits, schedules }}
+                state={{ schedule, credits, schedules, user }}
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
                 Search
@@ -117,9 +119,9 @@ function ScheduleComponent() {
         </ul>
       </nav>
       <Routes>
-        <Route path="view/" element={<ScheduleViewComponent schedule={schedule} />} />
-        <Route path="search/" element={<SearchComponent schedule={schedule} />} />
-        <Route path="statussheet/" element={<StatusSheetComponent schedule={schedule} />} />
+        <Route path="view/" element={<ScheduleViewComponent schedule={schedule} user={user} />} />
+        <Route path="search/" element={<SearchComponent schedule={schedule} user={user} />} />
+        <Route path="statussheet/" element={<StatusSheetComponent schedule={schedule} user={user} />} />
       </Routes>
     </div>
   );
