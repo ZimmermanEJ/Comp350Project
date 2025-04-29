@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import '../signup.css'; // Import the CSS file
@@ -9,6 +9,18 @@ function SignupComponent() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate(); // useNavigate hook for navigation
+
+  useEffect(() => {
+    const logout = async () => {
+        try {
+          const response = await axios.post('http://localhost:4567/api/logout');
+        } catch (error) {
+          console.error('Logout failed:', error.response?.data.message);
+        }
+    }
+
+    logout();
+  });
 
   const handleSignup = async (e) => {
     e.preventDefault();

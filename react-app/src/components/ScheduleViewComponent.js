@@ -6,6 +6,7 @@ import '../ScheduleView.css';
 
 function ScheduleViewComponent() {
   const location = useLocation();
+  const user = location.state?.user;
   const [schedule, setSchedule] = useState(location.state?.schedule);
   const [credits, setCredits] = useState(location.state?.credits);
   const schedules = location.state?.schedules;
